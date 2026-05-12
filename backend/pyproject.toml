@@ -1,0 +1,8 @@
+[project]
+name = "food-demand-forecasting-backend"
+version = "1.0.0"
+requires-python = ">=3.10"
+
+[tool.pyrefly]
+project_root = "."
+search_path = ["."]

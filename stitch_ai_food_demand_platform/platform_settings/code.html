@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings - SupplyChain AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed": "#ffddb8",
+                      "tertiary": "#825100",
+                      "primary-fixed-dim": "#c0c1ff",
+                      "secondary-container": "#6cf8bb",
+                      "surface": "#f8f9ff",
+                      "on-tertiary-container": "#fffbff",
+                      "outline": "#767586",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-low": "#eff4ff",
+                      "primary-fixed": "#e1e0ff",
+                      "surface-container": "#e5eeff",
+                      "on-error": "#ffffff",
+                      "primary-container": "#6063ee",
+                      "secondary-fixed": "#6ffbbe",
+                      "secondary-fixed-dim": "#4edea3",
+                      "tertiary-container": "#a36700",
+                      "primary": "#4648d4",
+                      "error": "#ba1a1a",
+                      "on-primary-container": "#fffbff",
+                      "on-secondary-fixed": "#002113",
+                      "on-error-container": "#93000a",
+                      "on-surface-variant": "#464554",
+                      "on-surface": "#0b1c30",
+                      "on-primary-fixed": "#07006c",
+                      "on-background": "#0b1c30",
+                      "surface-variant": "#d3e4fe",
+                      "tertiary-fixed-dim": "#ffb95f",
+                      "on-tertiary-fixed": "#2a1700",
+                      "outline-variant": "#c7c4d7",
+                      "inverse-primary": "#c0c1ff",
+                      "surface-dim": "#cbdbf5",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary": "#006c49",
+                      "on-primary-fixed-variant": "#2f2ebe",
+                      "surface-tint": "#494bd6",
+                      "on-secondary-container": "#00714d",
+                      "inverse-surface": "#213145",
+                      "on-primary": "#ffffff",
+                      "surface-bright": "#f8f9ff",
+                      "on-secondary-fixed-variant": "#005236",
+                      "surface-container-high": "#dce9ff",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-fixed-variant": "#653e00",
+                      "surface-container-highest": "#d3e4fe",
+                      "inverse-on-surface": "#eaf1ff",
+                      "background": "#f8f9ff",
+                      "on-secondary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "margin-desktop": "48px",
+                      "margin-mobile": "16px",
+                      "stack-lg": "32px",
+                      "stack-sm": "8px",
+                      "container-max": "1440px",
+                      "stack-md": "16px"
+              },
+              "fontFamily": {
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "mono-label": [
+                              "Geist"
+                      ],
+                      "headline-md": [
+                              "Geist"
+                      ],
+                      "display-lg": [
+                              "Geist"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "mono-label": [
+                              "13px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+      </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen">
+<!-- SideNavBar -->
+<nav class="hidden md:flex fixed left-0 top-0 h-full w-[240px] flex-col py-stack-md bg-surface/70 dark:bg-inverse-surface/70 backdrop-blur-xl border-r border-outline-variant/30 dark:border-outline/20 shadow-sm shadow-primary/5 z-50">
+<div class="px-gutter mb-stack-lg">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">SupplyChain AI</h1>
+<p class="font-label-md text-label-md text-on-surface-variant mt-1">Enterprise Plan</p>
+</div>
+<ul class="flex flex-col flex-grow px-stack-sm space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-2 rounded-DEFAULT text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+                    Dashboard
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2 rounded-DEFAULT text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">inventory_2</span>
+                    Inventory
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2 rounded-DEFAULT text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+                    Analytics
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2 rounded-DEFAULT text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">local_shipping</span>
+                    Suppliers
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-2 rounded-DEFAULT text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">online_prediction</span>
+                    Forecasting
+                </a>
+</li>
+<!-- Active State -->
+<li>
+<a class="flex items-center gap-3 px-4 py-2 rounded-DEFAULT text-primary dark:text-primary-fixed-dim font-bold bg-primary-container/10 font-label-md text-label-md Active: scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-[20px] icon-fill">settings</span>
+                    Settings
+                </a>
+</li>
+</ul>
+<div class="px-stack-sm mt-auto mb-stack-md">
+<button class="w-full py-2 bg-primary text-on-primary rounded-DEFAULT font-label-md text-label-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+                Ask AI Assistant
+             </button>
+</div>
+<div class="border-t border-outline-variant/30 mt-auto pt-stack-sm px-stack-sm flex flex-col space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 rounded-DEFAULT text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+                Support
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 rounded-DEFAULT text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+                Sign Out
+            </a>
+</div>
+</nav>
+<!-- TopNavBar -->
+<header class="hidden md:flex justify-between items-center h-16 px-margin-desktop sticky top-0 z-40 ml-[240px] bg-surface/70 dark:bg-inverse-surface/70 backdrop-blur-xl border-b border-outline-variant/30 dark:border-outline/20 shadow-sm shadow-primary/5">
+<!-- Left Side: Product Name (or active section) -->
+<div class="flex items-center gap-6">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">SupplyChain AI</span>
+<nav class="hidden lg:flex items-center space-x-6 h-full font-label-md text-label-md">
+<a class="h-full flex items-center text-on-surface-variant hover:text-primary hover:text-primary transition-colors" href="#">Overview</a>
+<a class="h-full flex items-center text-on-surface-variant hover:text-primary hover:text-primary transition-colors" href="#">Reports</a>
+<a class="h-full flex items-center text-on-surface-variant hover:text-primary hover:text-primary transition-colors" href="#">History</a>
+</nav>
+</div>
+<!-- Right Side: Actions -->
+<div class="flex items-center gap-4 text-primary dark:text-primary-fixed-dim">
+<button class="hover:opacity-80 transition-opacity p-2 rounded-full hover:bg-surface-variant/50">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:opacity-80 transition-opacity p-2 rounded-full hover:bg-surface-variant/50">
+<span class="material-symbols-outlined">smart_toy</span>
+</button>
+<button class="hover:opacity-80 transition-opacity p-2 rounded-full hover:bg-surface-variant/50">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="md:ml-[240px] min-h-screen p-margin-mobile md:p-margin-desktop bg-background/50">
+<div class="max-w-container-max mx-auto">
+<!-- Page Header -->
+<div class="mb-stack-lg">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-2">Settings</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Manage your account settings, integrations, and preferences.</p>
+</div>
+<div class="flex flex-col lg:flex-row gap-gutter items-start">
+<!-- Vertical Navigation (Bento Grid Left Col) -->
+<nav class="w-full lg:w-[240px] shrink-0 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0">
+<button class="text-left px-4 py-3 rounded-lg bg-surface text-primary font-label-md text-label-md border border-outline-variant/30 shadow-sm whitespace-nowrap">
+                        General
+                    </button>
+<button class="text-left px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 hover:text-on-surface font-label-md text-label-md transition-colors whitespace-nowrap">
+                        Security
+                    </button>
+<button class="text-left px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 hover:text-on-surface font-label-md text-label-md transition-colors whitespace-nowrap">
+                        Notifications
+                    </button>
+<button class="text-left px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 hover:text-on-surface font-label-md text-label-md transition-colors whitespace-nowrap">
+                        AI Model Tuning
+                    </button>
+</nav>
+<!-- Settings Content Area -->
+<div class="flex-grow w-full space-y-stack-lg">
+<!-- Profile Section Glassmorphic Card -->
+<div class="bg-surface/70 backdrop-blur-xl border border-outline-variant/30 rounded-xl shadow-sm shadow-primary/5 overflow-hidden">
+<div class="px-6 py-5 border-b border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md text-on-surface">Profile Information</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Update your account's profile information and email address.</p>
+</div>
+<div class="p-6 space-y-6">
+<!-- Avatar Upload -->
+<div class="flex items-center gap-6">
+<div class="w-20 h-20 rounded-full overflow-hidden border-2 border-surface shadow-sm relative group bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-outline text-3xl">person</span>
+<!-- Decorative overlay for hover state -->
+<div class="absolute inset-0 bg-on-surface/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+<span class="material-symbols-outlined text-white">upload</span>
+</div>
+</div>
+<div>
+<button class="px-4 py-2 border border-outline-variant rounded-DEFAULT text-on-surface font-label-md text-label-md hover:bg-surface-variant/50 transition-colors">Change Avatar</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="block font-label-md text-label-md text-on-surface">Full Name</label>
+<!-- Sunken Input Style -->
+<input class="w-full bg-surface-dim border border-outline-variant/50 rounded-DEFAULT px-4 py-2.5 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" type="text" value="Jane Doe"/>
+</div>
+<div class="space-y-2">
+<label class="block font-label-md text-label-md text-on-surface">Email Address</label>
+<input class="w-full bg-surface-dim border border-outline-variant/50 rounded-DEFAULT px-4 py-2.5 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" type="email" value="jane.doe@supplychain.ai"/>
+</div>
+</div>
+<div class="pt-4 flex justify-end">
+<button class="px-6 py-2.5 bg-primary text-on-primary rounded-DEFAULT font-label-md text-label-md hover:bg-primary/90 shadow-sm transition-colors border-t border-white/20">Save Changes</button>
+</div>
+</div>
+</div>
+<!-- Appearance Section -->
+<div class="bg-surface/70 backdrop-blur-xl border border-outline-variant/30 rounded-xl shadow-sm shadow-primary/5 overflow-hidden">
+<div class="px-6 py-5 border-b border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md text-on-surface">Appearance</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Customize how the application looks on your device.</p>
+</div>
+<div class="p-6">
+<div class="flex items-center justify-between">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Theme Preference</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Select light or dark mode.</p>
+</div>
+<div class="flex items-center gap-2 bg-surface-variant/50 p-1 rounded-lg border border-outline-variant/30">
+<button class="px-3 py-1.5 rounded-DEFAULT bg-surface shadow-sm text-primary font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">light_mode</span>
+                                        Light
+                                    </button>
+<button class="px-3 py-1.5 rounded-DEFAULT text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[18px]">dark_mode</span>
+                                        Dark
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+<!-- API Keys Section -->
+<div class="bg-surface/70 backdrop-blur-xl border border-outline-variant/30 rounded-xl shadow-sm shadow-primary/5 overflow-hidden">
+<div class="px-6 py-5 border-b border-outline-variant/30 flex justify-between items-center">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">API Keys</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Manage API keys for supply chain integrations.</p>
+</div>
+<button class="px-4 py-2 border border-outline-variant rounded-DEFAULT text-on-surface font-label-md text-label-md hover:bg-surface-variant/50 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                                Create New Key
+                            </button>
+</div>
+<div class="p-0">
+<!-- List Item 1 -->
+<div class="px-6 py-4 flex items-center justify-between border-b border-outline-variant/10 hover:bg-surface-variant/20 transition-colors">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">ERP Integration (Production)</h4>
+<div class="flex items-center gap-2 mt-1">
+<code class="font-mono-label text-mono-label text-on-surface-variant bg-surface-dim px-2 py-1 rounded border border-outline-variant/30">sk_live_...4f9a</code>
+<span class="text-xs text-outline">Created Oct 12, 2023</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors" title="Copy">
+<span class="material-symbols-outlined text-[20px]">content_copy</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error transition-colors" title="Revoke">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- List Item 2 -->
+<div class="px-6 py-4 flex items-center justify-between hover:bg-surface-variant/20 transition-colors">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Warehouse Scanner Staging</h4>
+<div class="flex items-center gap-2 mt-1">
+<code class="font-mono-label text-mono-label text-on-surface-variant bg-surface-dim px-2 py-1 rounded border border-outline-variant/30">sk_test_...8b2c</code>
+<span class="text-xs text-outline">Created Jan 05, 2024</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors" title="Copy">
+<span class="material-symbols-outlined text-[20px]">content_copy</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error transition-colors" title="Revoke">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

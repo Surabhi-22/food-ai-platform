@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Billing &amp; Orders - SupplyChain AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed": "#ffddb8",
+                      "tertiary": "#825100",
+                      "primary-fixed-dim": "#c0c1ff",
+                      "secondary-container": "#6cf8bb",
+                      "surface": "#f8f9ff",
+                      "on-tertiary-container": "#fffbff",
+                      "outline": "#767586",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-low": "#eff4ff",
+                      "primary-fixed": "#e1e0ff",
+                      "surface-container": "#e5eeff",
+                      "on-error": "#ffffff",
+                      "primary-container": "#6063ee",
+                      "secondary-fixed": "#6ffbbe",
+                      "secondary-fixed-dim": "#4edea3",
+                      "tertiary-container": "#a36700",
+                      "primary": "#4648d4",
+                      "error": "#ba1a1a",
+                      "on-primary-container": "#fffbff",
+                      "on-secondary-fixed": "#002113",
+                      "on-error-container": "#93000a",
+                      "on-surface-variant": "#464554",
+                      "on-surface": "#0b1c30",
+                      "on-primary-fixed": "#07006c",
+                      "on-background": "#0b1c30",
+                      "surface-variant": "#d3e4fe",
+                      "tertiary-fixed-dim": "#ffb95f",
+                      "on-tertiary-fixed": "#2a1700",
+                      "outline-variant": "#c7c4d7",
+                      "inverse-primary": "#c0c1ff",
+                      "surface-dim": "#cbdbf5",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary": "#006c49",
+                      "on-primary-fixed-variant": "#2f2ebe",
+                      "surface-tint": "#494bd6",
+                      "on-secondary-container": "#00714d",
+                      "inverse-surface": "#213145",
+                      "on-primary": "#ffffff",
+                      "surface-bright": "#f8f9ff",
+                      "on-secondary-fixed-variant": "#005236",
+                      "surface-container-high": "#dce9ff",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-fixed-variant": "#653e00",
+                      "surface-container-highest": "#d3e4fe",
+                      "inverse-on-surface": "#eaf1ff",
+                      "background": "#f8f9ff",
+                      "on-secondary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "margin-desktop": "48px",
+                      "margin-mobile": "16px",
+                      "stack-lg": "32px",
+                      "stack-sm": "8px",
+                      "container-max": "1440px",
+                      "stack-md": "16px"
+              },
+              "fontFamily": {
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "mono-label": [
+                              "Geist"
+                      ],
+                      "headline-md": [
+                              "Geist"
+                      ],
+                      "display-lg": [
+                              "Geist"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "mono-label": [
+                              "13px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.05), 0 2px 4px -1px rgba(99, 102, 241, 0.03);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex antialiased">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full w-[240px] bg-surface/70 dark:bg-inverse-surface/70 backdrop-blur-xl border-r border-outline-variant/30 dark:border-outline/20 shadow-sm shadow-primary/5 flex flex-col h-full py-stack-md z-50 hidden md:flex">
+<div class="px-6 pb-6 border-b border-outline-variant/30 mb-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dataset</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">SupplyChain AI</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Enterprise Plan</p>
+</div>
+</div>
+<div class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+                Inventory
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                Analytics
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+                Suppliers
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="online_prediction">online_prediction</span>
+                Forecasting
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-primary dark:text-primary-fixed-dim font-bold bg-primary-container/10 transition-colors duration-200 font-label-md text-label-md scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+</div>
+<div class="px-4 pt-6 mt-auto">
+<button class="w-full bg-primary-container text-on-primary-container rounded-lg py-2 font-label-md text-label-md shadow hover:opacity-90 transition-opacity flex items-center justify-center gap-2 mb-4">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+                Ask AI Assistant
+            </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                    Support
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                    Sign Out
+                </a>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 md:ml-[240px] flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface/70 dark:bg-inverse-surface/70 backdrop-blur-xl border-b border-outline-variant/30 dark:border-outline/20 shadow-sm shadow-primary/5 docked full-width top-0 flex justify-between items-center h-16 px-margin-desktop sticky top-0 z-40">
+<div class="flex items-center gap-8">
+<div class="md:hidden">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">SupplyChain AI</span>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:text-primary transition-colors hover:opacity-80 transition-opacity" href="#">Overview</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:text-primary transition-colors hover:opacity-80 transition-opacity" href="#">Reports</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:text-primary transition-colors hover:opacity-80 transition-opacity" href="#">History</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-variant border border-outline-variant rounded-full py-1.5 pl-9 pr-4 font-body-sm text-body-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-64" placeholder="Search..." type="text"/>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 p-margin-mobile md:p-margin-desktop bg-gradient-to-br from-surface to-surface-container-low">
+<div class="max-w-container-max mx-auto space-y-stack-lg">
+<header class="mb-8">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Billing &amp; Orders</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Manage your subscription, forecasting limits, and view past invoices.</p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Current Plan Card -->
+<div class="lg:col-span-1 glass-card rounded-xl p-6 flex flex-col">
+<div class="flex justify-between items-start mb-6">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Current Plan</p>
+<h3 class="font-headline-md text-headline-md text-primary mt-1">Enterprise</h3>
+</div>
+<span class="bg-secondary-container text-on-secondary-container font-mono-label text-mono-label px-2 py-1 rounded">Active</span>
+</div>
+<div class="space-y-4 mb-8 flex-1">
+<div>
+<div class="flex justify-between font-body-sm text-body-sm mb-1">
+<span class="text-on-surface-variant">Forecasts Remaining</span>
+<span class="font-medium text-on-surface">8,420 / 10,000</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2">
+<div class="bg-secondary h-2 rounded-full" style="width: 84%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-body-sm text-body-sm mb-1">
+<span class="text-on-surface-variant">API Calls</span>
+<span class="font-medium text-on-surface">1.2M / 2M</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2">
+<div class="bg-primary h-2 rounded-full" style="width: 60%"></div>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/50">
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">$4,999/month. Next billing date: Oct 1, 2023</p>
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-2.5 rounded-lg shadow-sm border-t border-white/20 hover:opacity-90 transition-opacity">
+                                Upgrade Plan
+                            </button>
+</div>
+</div>
+<!-- Order History Table -->
+<div class="lg:col-span-2 glass-card rounded-xl overflow-hidden flex flex-col">
+<div class="p-6 border-b border-outline-variant/50 flex justify-between items-center bg-surface/50">
+<h3 class="font-headline-md text-headline-md text-on-surface">Order History</h3>
+<button class="font-label-md text-label-md text-primary hover:text-primary-container transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">download</span> Export All
+                            </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-variant/30 border-b border-outline-variant/50">
+<th class="font-label-md text-label-md text-on-surface-variant px-6 py-3 font-medium">Invoice</th>
+<th class="font-label-md text-label-md text-on-surface-variant px-6 py-3 font-medium">Date</th>
+<th class="font-label-md text-label-md text-on-surface-variant px-6 py-3 font-medium">Amount</th>
+<th class="font-label-md text-label-md text-on-surface-variant px-6 py-3 font-medium">Status</th>
+<th class="font-label-md text-label-md text-on-surface-variant px-6 py-3 font-medium text-right">Action</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm">
+<tr class="border-b border-outline-variant/20 hover:bg-surface-variant/10 transition-colors">
+<td class="px-6 py-4 font-mono-label text-mono-label text-on-surface">INV-2023-009</td>
+<td class="px-6 py-4 text-on-surface-variant">Sep 1, 2023</td>
+<td class="px-6 py-4 text-on-surface font-medium">$4,999.00</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-variant text-primary">Processing</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">receipt</span>
+</button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/20 hover:bg-surface-variant/10 transition-colors">
+<td class="px-6 py-4 font-mono-label text-mono-label text-on-surface">INV-2023-008</td>
+<td class="px-6 py-4 text-on-surface-variant">Aug 1, 2023</td>
+<td class="px-6 py-4 text-on-surface font-medium">$4,999.00</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary-container/50 text-on-secondary-container">Completed</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/20 hover:bg-surface-variant/10 transition-colors">
+<td class="px-6 py-4 font-mono-label text-mono-label text-on-surface">INV-2023-007</td>
+<td class="px-6 py-4 text-on-surface-variant">Jul 1, 2023</td>
+<td class="px-6 py-4 text-on-surface font-medium">$4,999.00</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary-container/50 text-on-secondary-container">Completed</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-variant/10 transition-colors">
+<td class="px-6 py-4 font-mono-label text-mono-label text-on-surface">INV-2023-006</td>
+<td class="px-6 py-4 text-on-surface-variant">Jun 1, 2023</td>
+<td class="px-6 py-4 text-on-surface font-medium">$4,999.00</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary-container/50 text-on-secondary-container">Completed</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-outline-variant/50 bg-surface/30 text-center">
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">View Older Invoices</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

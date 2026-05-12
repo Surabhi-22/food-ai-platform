@@ -1,0 +1,98 @@
+# ==============================================================================
+# AI-Powered Vendor Food Demand Forecasting & Analytics Platform
+# Backend Python Dependencies
+# Python 3.11+
+# ==============================================================================
+
+# ─── Web Framework ────────────────────────────────────────────────────────────
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+
+# ─── Database & ORM ───────────────────────────────────────────────────────────
+sqlalchemy==2.0.30
+alembic==1.13.1
+asyncpg==0.29.0                     # Async PostgreSQL driver
+psycopg2-binary==2.9.9              # Sync PostgreSQL driver (Alembic)
+supabase==2.4.6                     # Supabase Python client
+
+# ─── Auth & Security ──────────────────────────────────────────────────────────
+python-jose[cryptography]==3.3.0    # JWT token handling
+passlib[bcrypt]==1.7.4              # Password hashing
+bcrypt==4.1.3
+
+# ─── Validation & Config ──────────────────────────────────────────────────────
+pydantic==2.7.1
+pydantic-settings==2.2.1
+python-dotenv==1.0.1
+email-validator==2.1.1
+
+# ─── Data Processing & Feature Engineering ────────────────────────────────────
+pandas==2.2.2
+numpy==1.26.4
+scipy==1.13.0
+
+# ─── Machine Learning — Preprocessing & Clustering ───────────────────────────
+scikit-learn==1.4.2
+joblib==1.4.2                       # Model serialization
+
+# ─── Machine Learning — XGBoost ──────────────────────────────────────────────
+xgboost==2.0.3
+
+# ─── Machine Learning — LSTM (TensorFlow/Keras) ───────────────────────────────
+tensorflow==2.16.1
+keras==3.3.3
+
+# ─── ML Experiment Tracking (optional but recommended) ───────────────────────
+mlflow==2.12.2
+
+# ─── AI / LLM ─────────────────────────────────────────────────────────────────
+openai==1.30.1                      # OpenAI GPT-4o API
+langchain==0.2.1                    # RAG orchestration
+langchain-openai==0.1.8             # LangChain OpenAI integration
+langchain-pinecone==0.1.1           # LangChain Pinecone integration
+tiktoken==0.7.0                     # Token counting for OpenAI
+
+# ─── Vector Database ──────────────────────────────────────────────────────────
+pinecone-client==3.2.2
+
+# ─── Background Jobs / Task Queue ────────────────────────────────────────────
+celery==5.4.0
+redis==5.0.4                        # Redis client + Celery broker
+apscheduler==3.10.4                 # Lightweight in-process scheduler
+
+# ─── HTTP Client (for external APIs) ─────────────────────────────────────────
+httpx==0.27.0
+aiohttp==3.9.5
+requests==2.32.2
+
+# ─── External Integrations ───────────────────────────────────────────────────
+pyowm==3.3.0                        # OpenWeatherMap Python wrapper
+holidays==0.46                      # Public holidays calendar
+
+# ─── WebSockets ───────────────────────────────────────────────────────────────
+websockets==12.0
+
+# ─── Logging & Observability ─────────────────────────────────────────────────
+sentry-sdk[fastapi]==2.3.1
+loguru==0.7.2
+structlog==24.1.0
+
+# ─── Utilities ────────────────────────────────────────────────────────────────
+python-dateutil==2.9.0
+pytz==2024.1
+tenacity==8.3.0                     # Retry logic for API calls
+cachetools==5.3.3
+
+# ─── Testing ─────────────────────────────────────────────────────────────────
+pytest==8.2.0
+pytest-asyncio==0.23.6
+pytest-cov==5.0.0
+httpx==0.27.0                       # TestClient for FastAPI
+factory-boy==3.3.0                  # Test fixtures
+
+# ─── Development Tools ───────────────────────────────────────────────────────
+black==24.4.2                       # Code formatter
+ruff==0.4.4                         # Linter
+mypy==1.10.0                        # Type checker
+pre-commit==3.7.1

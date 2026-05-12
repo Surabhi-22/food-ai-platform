@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Inventory | SupplyChain AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "tertiary-fixed": "#ffddb8",
+                "tertiary": "#825100",
+                "primary-fixed-dim": "#c0c1ff",
+                "secondary-container": "#6cf8bb",
+                "surface": "#f8f9ff",
+                "on-tertiary-container": "#fffbff",
+                "outline": "#767586",
+                "on-tertiary": "#ffffff",
+                "surface-container-low": "#eff4ff",
+                "primary-fixed": "#e1e0ff",
+                "surface-container": "#e5eeff",
+                "on-error": "#ffffff",
+                "primary-container": "#6063ee",
+                "secondary-fixed": "#6ffbbe",
+                "secondary-fixed-dim": "#4edea3",
+                "tertiary-container": "#a36700",
+                "primary": "#4648d4",
+                "error": "#ba1a1a",
+                "on-primary-container": "#fffbff",
+                "on-secondary-fixed": "#002113",
+                "on-error-container": "#93000a",
+                "on-surface-variant": "#464554",
+                "on-surface": "#0b1c30",
+                "on-primary-fixed": "#07006c",
+                "on-background": "#0b1c30",
+                "surface-variant": "#d3e4fe",
+                "tertiary-fixed-dim": "#ffb95f",
+                "on-tertiary-fixed": "#2a1700",
+                "outline-variant": "#c7c4d7",
+                "inverse-primary": "#c0c1ff",
+                "surface-dim": "#cbdbf5",
+                "surface-container-lowest": "#ffffff",
+                "secondary": "#006c49",
+                "on-primary-fixed-variant": "#2f2ebe",
+                "surface-tint": "#494bd6",
+                "on-secondary-container": "#00714d",
+                "inverse-surface": "#213145",
+                "on-primary": "#ffffff",
+                "surface-bright": "#f8f9ff",
+                "on-secondary-fixed-variant": "#005236",
+                "surface-container-high": "#dce9ff",
+                "error-container": "#ffdad6",
+                "on-tertiary-fixed-variant": "#653e00",
+                "surface-container-highest": "#d3e4fe",
+                "inverse-on-surface": "#eaf1ff",
+                "background": "#f8f9ff",
+                "on-secondary": "#ffffff"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "gutter": "24px",
+                "margin-desktop": "48px",
+                "margin-mobile": "16px",
+                "stack-lg": "32px",
+                "stack-sm": "8px",
+                "container-max": "1440px",
+                "stack-md": "16px"
+        },
+        "fontFamily": {
+                "label-md": [
+                        "Geist"
+                ],
+                "mono-label": [
+                        "Geist"
+                ],
+                "headline-md": [
+                        "Geist"
+                ],
+                "display-lg": [
+                        "Geist"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "headline-lg": [
+                        "Geist"
+                ],
+                "body-sm": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "1",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "500"
+                        }
+                ],
+                "mono-label": [
+                        "13px",
+                        {
+                                "lineHeight": "1",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "1.3",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "1.1",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "1.5",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "1.6",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-sm": [
+                        "14px",
+                        {
+                                "lineHeight": "1.5",
+                                "fontWeight": "400"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+  body {
+    background-color: theme('colors.background');
+    color: theme('colors.on-background');
+  }
+</style>
+</head>
+<body class="font-body-md text-body-md min-h-screen flex antialiased">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col h-full py-stack-md bg-surface/70 backdrop-blur-xl fixed left-0 top-0 w-[240px] border-r border-outline-variant/30 shadow-sm shadow-primary/5 z-50">
+<div class="px-margin-mobile mb-stack-lg">
+<h1 class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">widgets</span>
+        SupplyChain AI
+      </h1>
+<p class="font-label-md text-label-md text-on-surface-variant mt-1">Enterprise Plan</p>
+</div>
+<nav class="flex-1 overflow-y-auto px-2 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-primary font-bold bg-primary-container/10 transition-transform scale-95" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-label-md text-label-md">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="font-label-md text-label-md">Suppliers</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">online_prediction</span>
+<span class="font-label-md text-label-md">Forecasting</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-primary-container/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-margin-mobile flex flex-col gap-2 pt-stack-md border-t border-outline-variant/30">
+<button class="w-full py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm border-t border-white/20">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+        Ask AI Assistant
+      </button>
+<div class="flex items-center justify-between mt-4">
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+          Support
+        </a>
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+          Sign Out
+        </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="flex-1 md:ml-[240px] flex flex-col min-h-screen bg-surface">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center h-16 px-margin-desktop sticky top-0 z-40 bg-surface/70 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm shadow-primary/5">
+<!-- Mobile Menu Button (Hidden on Desktop) -->
+<button class="md:hidden text-on-surface-variant p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="flex items-center gap-6">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface md:hidden">SupplyChain AI</h2>
+<div class="hidden md:flex gap-6 h-full items-center">
+<a class="text-primary border-b-2 border-primary h-full flex items-center px-1 font-label-md text-label-md" href="#">Overview</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors h-full flex items-center px-1 font-label-md text-label-md hover:opacity-80 transition-opacity" href="#">Reports</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors h-full flex items-center px-1 font-label-md text-label-md hover:opacity-80 transition-opacity" href="#">History</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+<input class="pl-10 pr-4 py-1.5 rounded-full bg-surface-container-low border border-outline-variant/50 focus:border-primary focus:ring-1 focus:ring-primary outline-none font-body-sm text-body-sm w-64 transition-all" placeholder="Search inventory..." type="text"/>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors hover:opacity-80 transition-opacity p-1 rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors hover:opacity-80 transition-opacity p-1 rounded-full">
+<span class="material-symbols-outlined">smart_toy</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors hover:opacity-80 transition-opacity p-1 rounded-full">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-margin-mobile md:p-margin-desktop flex-1 max-w-[container-max] mx-auto w-full">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-stack-lg gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Inventory Management</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Real-time stock levels and AI-driven forecasting.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 border border-outline-variant bg-surface-container-lowest text-on-surface rounded-lg font-label-md text-label-md hover:bg-surface-variant transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">filter_list</span> Filter
+          </button>
+<button class="px-4 py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-colors shadow-sm border-t border-white/20 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span> Add Item
+          </button>
+</div>
+</div>
+<!-- Critical Alerts Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-stack-lg">
+<!-- Low Stock Alert -->
+<div class="bg-surface-container-lowest/70 backdrop-blur-md border border-error/20 rounded-xl p-6 shadow-sm flex flex-col relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-error/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2 text-error">
+<span class="material-symbols-outlined">warning</span>
+<span class="font-label-md text-label-md uppercase tracking-wider">Low Stock Alert</span>
+</div>
+<span class="px-2 py-1 bg-error-container text-on-error-container rounded font-mono-label text-mono-label">3 Items</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Perishables</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex-1 mb-4">Organic Avocados, Baby Spinach, Fresh Salmon are below reorder threshold.</p>
+<button class="mt-auto w-full py-2 bg-error text-on-error rounded-lg font-label-md text-label-md hover:bg-error/90 transition-colors text-center">
+            Review Orders
+          </button>
+</div>
+<!-- AI Forecast -->
+<div class="bg-surface-container-lowest/70 backdrop-blur-md border border-outline-variant/50 rounded-xl p-6 shadow-sm flex flex-col relative overflow-hidden col-span-1 md:col-span-2">
+<div class="absolute bottom-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mb-20 pointer-events-none"></div>
+<div class="flex items-center justify-between mb-4 border-b border-outline-variant/30 pb-4">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-[20px]">smart_toy</span>
+<span class="font-label-md text-label-md uppercase tracking-wider">AI Restock Suggestions</span>
+</div>
+<span class="font-mono-label text-mono-label text-on-surface-variant">Last updated: 5 mins ago</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-lg border border-outline-variant/20">
+<div>
+<p class="font-label-md text-label-md text-on-surface">Whole Wheat Flour</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">+20% predicted demand</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-label-md text-secondary">Order 500kg</p>
+<button class="text-primary font-mono-label text-mono-label hover:underline mt-1">Approve</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-lg border border-outline-variant/20">
+<div>
+<p class="font-label-md text-label-md text-on-surface">Olive Oil (Extra Virgin)</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Supplier delay expected</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-label-md text-secondary">Order 200L</p>
+<button class="text-primary font-mono-label text-mono-label hover:underline mt-1">Approve</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Inventory Table Card -->
+<div class="bg-surface-container-lowest/70 backdrop-blur-md border border-outline-variant/50 rounded-xl shadow-[0_4px_6px_-1px_rgba(99,102,241,0.05)] overflow-hidden">
+<div class="p-4 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-lowest">
+<h3 class="font-headline-md text-headline-md text-on-surface text-[18px]">Detailed Inventory List</h3>
+<div class="flex gap-2">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+<input class="pl-8 pr-3 py-1 rounded bg-surface border border-outline-variant/50 focus:border-primary outline-none font-body-sm text-body-sm w-48" placeholder="Search items..." type="text"/>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/30 bg-surface-container-low/50">
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant">Item</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant">Status</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant text-right">Current Stock</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant text-right">Reorder Point</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant text-right">Lead Time</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant">Supplier</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant text-center">Auto-Restock</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm text-on-surface divide-y divide-outline-variant/20">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-variant/30 transition-colors">
+<td class="py-3 px-4">
+<p class="font-medium">Organic Avocados</p>
+<p class="text-on-surface-variant text-xs">SKU: FR-AVO-01</p>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-error-container text-on-error-container font-mono-label text-[11px] uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span> Low Stock
+                  </span>
+</td>
+<td class="py-3 px-4 text-right font-mono-label">120 kg</td>
+<td class="py-3 px-4 text-right font-mono-label text-on-surface-variant">150 kg</td>
+<td class="py-3 px-4 text-right font-mono-label">2 Days</td>
+<td class="py-3 px-4">FreshFarms Inc.</td>
+<td class="py-3 px-4 text-center">
+<button class="relative inline-flex h-5 w-9 items-center rounded-full bg-outline-variant">
+<span class="inline-block h-4 w-4 transform rounded-full bg-white transition translate-x-1"></span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-variant/30 transition-colors">
+<td class="py-3 px-4">
+<p class="font-medium">Whole Wheat Flour</p>
+<p class="text-on-surface-variant text-xs">SKU: DR-WWF-05</p>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-secondary-container/30 text-on-secondary-container font-mono-label text-[11px] uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Optimal
+                  </span>
+</td>
+<td class="py-3 px-4 text-right font-mono-label">850 kg</td>
+<td class="py-3 px-4 text-right font-mono-label text-on-surface-variant">300 kg</td>
+<td class="py-3 px-4 text-right font-mono-label">5 Days</td>
+<td class="py-3 px-4">GrainMillers LLC</td>
+<td class="py-3 px-4 text-center">
+<button class="relative inline-flex h-5 w-9 items-center rounded-full bg-primary">
+<span class="inline-block h-4 w-4 transform rounded-full bg-white transition translate-x-4"></span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-variant/30 transition-colors">
+<td class="py-3 px-4">
+<p class="font-medium">Canned Tomatoes</p>
+<p class="text-on-surface-variant text-xs">SKU: CN-TOM-12</p>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-tertiary-fixed/50 text-on-tertiary-fixed font-mono-label text-[11px] uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> In Transit
+                  </span>
+</td>
+<td class="py-3 px-4 text-right font-mono-label">210 units</td>
+<td class="py-3 px-4 text-right font-mono-label text-on-surface-variant">200 units</td>
+<td class="py-3 px-4 text-right font-mono-label">14 Days</td>
+<td class="py-3 px-4">Global Canning Co.</td>
+<td class="py-3 px-4 text-center">
+<button class="relative inline-flex h-5 w-9 items-center rounded-full bg-primary">
+<span class="inline-block h-4 w-4 transform rounded-full bg-white transition translate-x-4"></span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-variant/30 transition-colors">
+<td class="py-3 px-4">
+<p class="font-medium">Olive Oil (Extra Virgin)</p>
+<p class="text-on-surface-variant text-xs">SKU: LQ-OO-02</p>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-secondary-container/30 text-on-secondary-container font-mono-label text-[11px] uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Optimal
+                  </span>
+</td>
+<td class="py-3 px-4 text-right font-mono-label">450 L</td>
+<td class="py-3 px-4 text-right font-mono-label text-on-surface-variant">150 L</td>
+<td class="py-3 px-4 text-right font-mono-label">10 Days</td>
+<td class="py-3 px-4">Mediterra Imports</td>
+<td class="py-3 px-4 text-center">
+<button class="relative inline-flex h-5 w-9 items-center rounded-full bg-outline-variant">
+<span class="inline-block h-4 w-4 transform rounded-full bg-white transition translate-x-1"></span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-outline-variant/30 flex justify-between items-center bg-surface-container-low/30">
+<p class="font-body-sm text-body-sm text-on-surface-variant">Showing 1 to 4 of 248 entries</p>
+<div class="flex gap-1">
+<button class="px-2 py-1 border border-outline-variant/50 rounded text-on-surface-variant hover:bg-surface-variant disabled:opacity-50" disabled="">Prev</button>
+<button class="px-2 py-1 border border-primary bg-primary text-on-primary rounded">1</button>
+<button class="px-2 py-1 border border-outline-variant/50 rounded text-on-surface-variant hover:bg-surface-variant">2</button>
+<button class="px-2 py-1 border border-outline-variant/50 rounded text-on-surface-variant hover:bg-surface-variant">3</button>
+<button class="px-2 py-1 border border-outline-variant/50 rounded text-on-surface-variant hover:bg-surface-variant">Next</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
