@@ -18,6 +18,7 @@ from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Any
 
 from app.core.config import get_settings
 from app.models.chat_session import ChatSession
@@ -237,7 +238,7 @@ class VendorChatbot:
         # Add current user message
         messages.append({"role": "user", "content": user_message})
 
-        return messages
+        return messages  # type: ignore[return-value]
 
     async def _call_gpt4o(self, messages: list[ChatCompletionMessageParam]) -> str:
         """Call OpenAI GPT-4o and return the response text."""
@@ -256,12 +257,13 @@ class VendorChatbot:
             reply = response.choices[0].message.content
             usage = response.usage
 
-            logger.info(
-                "GPT-4o response: %d tokens (prompt=%d, completion=%d)",
-                usage.total_tokens, usage.prompt_tokens, usage.completion_tokens,
-            )
+            if usage is not None:
+                logger.info(
+                    "GPT-4o response: %d tokens (prompt=%d, completion=%d)",
+                    usage.total_tokens, usage.prompt_tokens, usage.completion_tokens,
+                )
 
-            return reply
+            return reply or "I'm sorry, I could not generate a response."
 
         except Exception as e:
             logger.error("GPT-4o API call failed: %s", e)

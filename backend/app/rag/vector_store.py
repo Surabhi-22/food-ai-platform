@@ -33,7 +33,10 @@ def _get_pinecone_client() -> Pinecone:
     """Get or create the Pinecone client singleton."""
     global _pinecone_client
     if _pinecone_client is None:
-        if not settings.PINECONE_API_KEY:
+        if not settings.PINECONE_API_KEY or settings.PINECONE_API_KEY in (
+            "your-pinecone-api-key",
+            "",
+        ):
             raise ConnectionError("Pinecone API key not configured")
         _pinecone_client = Pinecone(api_key=settings.PINECONE_API_KEY)
         logger.info("Pinecone client initialized")
@@ -46,17 +49,26 @@ def _get_index():
     if _pinecone_index is None:
         pc = _get_pinecone_client()
 
-        # Create index if it doesn't exist
-        existing = [idx.name for idx in pc.list_indexes()]
+        try:
+            # Create index if it doesn't exist
+            existing = [idx.name for idx in pc.list_indexes()]
+        except Exception as e:
+            logger.warning("Pinecone list_indexes failed: %s — treating as unavailable", e)
+            raise ConnectionError(f"Pinecone unavailable: {e}") from e
+
         if INDEX_NAME not in existing:
-            logger.info("Creating Pinecone index: %s", INDEX_NAME)
-            pc.create_index(
-                name=INDEX_NAME,
-                dimension=EMBEDDING_DIMENSIONS,
-                metric="cosine",
-                spec=ServerlessSpec(cloud="aws", region="us-east-1"),
-            )
-            logger.info("Pinecone index created: %s", INDEX_NAME)
+            try:
+                logger.info("Creating Pinecone index: %s", INDEX_NAME)
+                pc.create_index(
+                    name=INDEX_NAME,
+                    dimension=EMBEDDING_DIMENSIONS,
+                    metric="cosine",
+                    spec=ServerlessSpec(cloud="aws", region="us-east-1"),
+                )
+                logger.info("Pinecone index created: %s", INDEX_NAME)
+            except Exception as e:
+                logger.warning("Pinecone create_index failed: %s", e)
+                raise ConnectionError(f"Pinecone index creation failed: {e}") from e
 
         _pinecone_index = pc.Index(INDEX_NAME)
         logger.info("Connected to Pinecone index: %s", INDEX_NAME)

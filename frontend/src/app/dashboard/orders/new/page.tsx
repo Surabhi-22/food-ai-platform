@@ -6,7 +6,8 @@ import { toast } from "sonner";
 
 import { MenuService } from "@/services/menu.service";
 import { OrdersService } from "@/services/orders.service";
-import { MenuItem, PaginatedResponse } from "@/types/api";
+import { MenuItem } from "@/types/index";
+import { PaginatedResponse } from "@/types/api";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,10 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { PremiumSkeleton } from "@/components/ui/premium-skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
+import { UtensilsCrossed, PackageOpen } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -66,8 +71,8 @@ export default function NewOrderPage() {
     const fetchMenu = async () => {
       try {
         const responseData = await MenuService.getMenuItems();
-        const data = Array.isArray(responseData) ? responseData : (responseData as PaginatedResponse<MenuItem>).data || [];
-        setMenuItems(data.filter((item: MenuItem) => item.is_active));
+        const data = (Array.isArray(responseData) ? responseData : (responseData as any).data) as unknown as MenuItem[];
+        setMenuItems(data?.filter((item: MenuItem) => item.is_active) || []);
       } catch (err) {
         console.error("Failed to fetch menu", err);
         toast.error("Failed to load menu items");
@@ -154,15 +159,18 @@ export default function NewOrderPage() {
     setIsSubmitting(true);
     try {
       const payload = {
-        customer_name: customerSearch || "Walk-in",
+        customer_id: customerSearch || "Walk-in",
         items: cartItems.map((ci) => ({
-          item_id: ci.menu_item.id,
+          menu_item_id: ci.menu_item.id,
           quantity: ci.quantity,
+          price: ci.menu_item.price,
+          menu_item_name: ci.menu_item.name,
         })),
         payment_method: paymentMethod,
+        total_amount: total,
       };
 
-      await OrdersService.createOrder(payload);
+      await OrdersService.createOrder(payload as any);
       toast.success("Order placed successfully!");
       
       // Reset form after submission
@@ -170,7 +178,8 @@ export default function NewOrderPage() {
       setCustomerSearch("");
       setPaymentMethod("Cash");
     } catch (err: unknown) {
-      toast.error(err.response?.data?.detail || "Failed to place order");
+      const error = err as any;
+      toast.error(error.response?.data?.detail || "Failed to place order");
     } finally {
       setIsSubmitting(false);
     }
@@ -179,11 +188,11 @@ export default function NewOrderPage() {
   /* ── Render ───────────────────────────────────────────────────── */
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">New Order</h2>
-        <p className="text-muted-foreground">Create a new order by selecting menu items.</p>
-      </div>
+    <div className="space-y-6 pb-8 animate-in fade-in duration-500">
+      <PageHeader
+        title="New Order"
+        description="Create a new order by selecting menu items."
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left – Menu Item Grid */}
@@ -234,9 +243,9 @@ export default function NewOrderPage() {
               {Array.from({ length: 6 }).map((_, i) => (
                 <Card key={i}>
                   <CardContent className="pt-6 space-y-3">
-                    <div className="h-4 bg-muted rounded animate-pulse" />
-                    <div className="h-3 w-2/3 bg-muted rounded animate-pulse" />
-                    <div className="h-8 bg-muted rounded animate-pulse" />
+                    <PremiumSkeleton className="h-4" />
+                    <PremiumSkeleton className="h-3 w-2/3" />
+                    <PremiumSkeleton className="h-8" />
                   </CardContent>
                 </Card>
               ))}
@@ -249,8 +258,8 @@ export default function NewOrderPage() {
                   <Card
                     key={item.id}
                     className={cn(
-                      "cursor-pointer transition-all hover:shadow-md hover:border-primary/50",
-                      inCart && "border-primary ring-1 ring-primary/20"
+                      "cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
+                      inCart && "border-primary ring-2 ring-primary/30 bg-primary/5"
                     )}
                     onClick={() => addToCart(item)}
                   >
@@ -274,8 +283,14 @@ export default function NewOrderPage() {
                 );
               })}
               {filteredMenu.length === 0 && (
-                <div className="col-span-full text-center py-12 text-muted-foreground">
-                  No menu items found.
+                <div className="col-span-full">
+                  <EmptyState
+                    icon={UtensilsCrossed}
+                    title="No items found"
+                    description="No menu items match your search or filter."
+                    minHeight="min-h-[200px]"
+                    className="border-none shadow-none bg-transparent"
+                  />
                 </div>
               )}
             </div>
@@ -284,8 +299,8 @@ export default function NewOrderPage() {
 
         {/* Right – Order Summary / Cart */}
         <div className="lg:col-span-1">
-          <Card className="sticky top-24">
-            <CardHeader>
+          <Card className="sticky top-24 border-t-4 border-t-primary shadow-xl">
+            <CardHeader className="bg-primary/5 border-b pb-4">
               <CardTitle className="flex items-center gap-2">
                 <ShoppingCart className="h-5 w-5" />
                 Order Summary
@@ -298,10 +313,13 @@ export default function NewOrderPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {cartItems.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <ShoppingCart className="mx-auto h-12 w-12 mb-3 opacity-30" />
-                  <p>Your cart is empty</p>
-                </div>
+                <EmptyState
+                  icon={ShoppingCart}
+                  title="Your cart is empty"
+                  description="Select items from the menu to add them to your order."
+                  minHeight="min-h-[200px]"
+                  className="border-none shadow-none bg-transparent p-4"
+                />
               ) : (
                 <>
                   {/* Cart Items */}
@@ -359,22 +377,22 @@ export default function NewOrderPage() {
                     ))}
                   </div>
 
-                  <Separator />
-
-                  {/* Totals */}
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Subtotal</span>
-                      <span>₹{subtotal.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">GST (5%)</span>
-                      <span>₹{tax.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-                    </div>
-                    <Separator />
-                    <div className="flex justify-between text-base font-bold">
-                      <span>Total</span>
-                      <span>₹{total.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                  <div className="pt-4 space-y-4">
+                    {/* Totals */}
+                    <div className="space-y-2 text-sm bg-muted/30 p-4 rounded-lg">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Subtotal</span>
+                        <span className="font-medium">₹{subtotal.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">GST (5%)</span>
+                        <span className="font-medium">₹{tax.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                      </div>
+                      <Separator className="my-2" />
+                      <div className="flex justify-between items-center">
+                        <span className="text-base font-bold">Total</span>
+                        <span className="text-2xl font-black text-primary">₹{total.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                      </div>
                     </div>
                   </div>
 
@@ -394,7 +412,7 @@ export default function NewOrderPage() {
 
                   {/* Submit */}
                   <Button
-                    className="w-full"
+                    className="w-full h-14 text-lg shadow-lg hover:shadow-xl transition-all"
                     size="lg"
                     onClick={handleSubmit}
                     disabled={isSubmitting}

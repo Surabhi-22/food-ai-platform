@@ -22,11 +22,14 @@ export interface Order {
   id: string;
   status: "pending" | "preparing" | "ready" | "completed" | "cancelled";
   total_amount: number;
+  customer_id?: string;
+  customer_name?: string;
   items: Array<{
     menu_item_id: string;
     quantity: number;
     price: number;
     name?: string;
+    menu_item_name?: string;
   }>;
   created_at: string;
 }

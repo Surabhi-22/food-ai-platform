@@ -81,10 +81,13 @@ def build_lstm_model(
     Returns:
         Compiled Keras Sequential model.
     """
-    import tensorflow as tf
-    from tensorflow.keras.models import Sequential
-    from tensorflow.keras.layers import LSTM, Dense, Dropout, Input
-    from tensorflow.keras.optimizers import Adam
+    import tensorflow as tf  # type: ignore[import-untyped]
+    Sequential = tf.keras.Sequential
+    LSTM = tf.keras.layers.LSTM
+    Dense = tf.keras.layers.Dense
+    Dropout = tf.keras.layers.Dropout
+    Input = tf.keras.layers.Input
+    Adam = tf.keras.optimizers.Adam
 
     if params is None:
         params = LSTM_PARAMS.copy()
@@ -194,8 +197,9 @@ def train_lstm(
             - metrics: {rmse, mae, mape}
             - training_history: Loss and metric history per epoch
     """
-    import tensorflow as tf
-    from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+    import tensorflow as tf  # type: ignore[import-untyped]
+    EarlyStopping = tf.keras.callbacks.EarlyStopping
+    ReduceLROnPlateau = tf.keras.callbacks.ReduceLROnPlateau
 
     if params is None:
         params = LSTM_PARAMS.copy()
@@ -208,8 +212,8 @@ def train_lstm(
     y_raw = df[TARGET_COLUMN].values.astype(np.float32)
 
     # Replace any remaining NaN/inf values
-    X_raw = np.nan_to_num(X_raw, nan=0.0, posinf=0.0, neginf=0.0)
-    y_raw = np.nan_to_num(y_raw, nan=0.0)
+    X_raw = np.asarray(np.nan_to_num(X_raw, nan=0.0, posinf=0.0, neginf=0.0), dtype=np.float32)
+    y_raw = np.asarray(np.nan_to_num(y_raw, nan=0.0), dtype=np.float32)
 
     if len(X_raw) < sequence_length + 10:
         logger.warning(
@@ -247,7 +251,7 @@ def train_lstm(
 
     # Build model
     n_features = X_seq.shape[2]
-    model = build_lstm_model(n_features, sequence_length, params)
+    model = build_lstm_model(n_features, int(sequence_length), params)
 
     # Callbacks
     callbacks = [
@@ -282,8 +286,8 @@ def train_lstm(
         y_pred = np.maximum(y_pred, 0)  # Demand cannot be negative
 
         metrics = {
-            "rmse": float(np.sqrt(mean_squared_error(y_val, y_pred))),
-            "mae": float(mean_absolute_error(y_val, y_pred)),
+            "rmse": float(np.sqrt(mean_squared_error(np.asarray(y_val), np.asarray(y_pred)))),
+            "mae": float(mean_absolute_error(np.asarray(y_val), np.asarray(y_pred))),
             "mape": calculate_mape(y_val, y_pred),
         }
     else:
@@ -291,8 +295,8 @@ def train_lstm(
         y_pred = model.predict(X_train, verbose=0).flatten()
         y_pred = np.maximum(y_pred, 0)
         metrics = {
-            "rmse": float(np.sqrt(mean_squared_error(y_train, y_pred))),
-            "mae": float(mean_absolute_error(y_train, y_pred)),
+            "rmse": float(np.sqrt(mean_squared_error(np.asarray(y_train), np.asarray(y_pred)))),
+            "mae": float(mean_absolute_error(np.asarray(y_train), np.asarray(y_pred))),
             "mape": calculate_mape(y_train, y_pred),
         }
 
@@ -330,7 +334,7 @@ def predict_lstm(
     Returns:
         Array of predicted demand quantities (clipped to >= 0).
     """
-    import tensorflow as tf
+    import tensorflow as tf  # type: ignore[import-untyped]
 
     model_path = _model_path(vendor_id)
     if not model_path.exists():

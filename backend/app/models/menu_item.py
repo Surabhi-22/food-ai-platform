@@ -22,6 +22,7 @@ class MenuItem(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     cogs_percentage: Mapped[Decimal] = mapped_column(
         Numeric(5, 2), nullable=False, server_default="30.00"
     )
+    description: Mapped[str | None] = mapped_column(String(1000), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
 
     # Relationships

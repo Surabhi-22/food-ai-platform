@@ -201,7 +201,7 @@ async def generate_forecasts(
 
         if lstm_results.get("model") is not None and len(item_df) >= sequence_length:
             X_raw = item_df[available_features].values.astype(np.float32)
-            X_raw = np.nan_to_num(X_raw, nan=0.0)
+            X_raw = np.asarray(np.nan_to_num(X_raw, nan=0.0), dtype=np.float32)
 
             for day_offset in range(forecast_days):
                 seq_start = max(0, len(X_raw) - sequence_length + day_offset)
@@ -284,7 +284,7 @@ def _create_future_features(
     feature_cols: list[str],
     forecast_date: date,
     day_offset: int,
-) -> np.ndarray:
+) -> "np.ndarray[tuple[int, int], np.dtype[np.float32]]":
     """
     Create a feature vector for a future date based on historical patterns.
 
@@ -315,7 +315,7 @@ def _create_future_features(
     if "lag_14" in base.columns and len(item_df) >= 14:
         base["lag_14"] = item_df[TARGET_COLUMN].iloc[-14]
 
-    return base.values.astype(np.float32)
+    return base.values.astype(np.float32)  # type: ignore[return-value]
 
 
 async def save_forecasts_to_db(

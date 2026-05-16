@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   BarChart3,
   Bell,
@@ -20,7 +20,6 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { nextApi } from "@/lib/api";
 
 const navigation = [
   { name: "Overview", href: "/dashboard", icon: LayoutDashboard, exact: true },
@@ -39,16 +38,26 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleLogout = async () => {
-    try {
-      await nextApi.post("/auth/logout");
-      router.push("/login");
-    } catch (error) {
-      console.error("Logout failed", error);
+  // In dev mode, don't set a fake token — the backend's deps.py dev bypass
+  // returns the first vendor automatically when no token is present.
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Clear any stale fake bypass token so the backend receives no token
+      // and its dev bypass (ENVIRONMENT=development) can auto-select a vendor.
+      const token = localStorage.getItem("access_token");
+      if (!token || token === "__dev_bypass__") {
+        localStorage.removeItem("access_token");
+      }
     }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    // Stay on dashboard — no redirect to login
+    window.location.reload();
   };
 
   return (

@@ -11,6 +11,9 @@ import {
   Percent,
   ShoppingBag,
   TrendingUp,
+  Star,
+  Flame,
+  Trophy,
 } from "lucide-react";
 import {
   Area,
@@ -32,10 +35,12 @@ import {
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PremiumSkeleton } from "@/components/ui/premium-skeleton";
+import { PageHeader } from "@/components/ui/page-header";
 import type { DateRange } from "react-day-picker";
 
 /* ------------------------------------------------------------------ */
@@ -124,8 +129,8 @@ const RevenueTooltip = ({ active, payload, label }: TooltipProps) => {
     : "0";
 
   return (
-    <div className="rounded-lg border bg-background p-3 shadow-lg">
-      <p className="text-sm font-medium mb-2">{label}</p>
+    <div className="rounded-xl border border-primary/10 glass bg-background/80 backdrop-blur-md p-4 shadow-xl">
+      <p className="text-sm font-bold mb-3 border-b pb-2">{label}</p>
       <div className="space-y-1 text-sm">
         <div className="flex items-center gap-2">
           <div className="h-2 w-2 rounded-full bg-indigo-500" />
@@ -365,61 +370,67 @@ export default function AnalyticsPage() {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <Skeleton className="h-10 w-48" />
-          <Skeleton className="h-10 w-64" />
+          <PremiumSkeleton className="h-10 w-48" />
+          <PremiumSkeleton className="h-10 w-64" />
         </div>
         <div className="grid gap-4 md:grid-cols-4">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-32" />)}
+          {[...Array(4)].map((_, i) => <PremiumSkeleton key={i} className="h-32" />)}
         </div>
-        <Skeleton className="h-[400px]" />
-        <div className="grid gap-4 md:grid-cols-2">
-          <Skeleton className="h-[350px]" />
-          <Skeleton className="h-[350px]" />
+        <PremiumSkeleton className="h-[400px]" />
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="flex flex-col gap-6">
+            <PremiumSkeleton className="h-32" />
+            <PremiumSkeleton className="h-32" />
+            <PremiumSkeleton className="flex-1 min-h-[300px]" />
+          </div>
+          <div className="lg:col-span-2 flex flex-col gap-6">
+            <PremiumSkeleton className="h-[350px]" />
+            <PremiumSkeleton className="flex-1 min-h-[300px]" />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8 animate-in fade-in duration-500">
       {/* ── Header + Date Range ──────────────────────────────────── */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Analytics</h2>
-          <p className="text-muted-foreground">Business intelligence powered by ML predictions.</p>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Quick Presets */}
-          {datePresets.slice(0, 3).map((preset) => (
-            <Button
-              key={preset.label}
-              variant={
-                dateRange.from?.toDateString() === preset.from.toDateString() ? "default" : "outline"
-              }
-              size="sm"
-              onClick={() => setDateRange({ from: preset.from, to: preset.to })}
-            >
-              {preset.label}
-            </Button>
-          ))}
-
-          {/* Calendar Picker */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="min-w-[200px] justify-start text-left font-normal">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateRange.from && dateRange.to
-                  ? `${format(dateRange.from, "LLL dd")} – ${format(dateRange.to, "LLL dd")}`
-                  : "Custom range"}
+      <PageHeader
+        title="Analytics"
+        description="Business intelligence powered by ML predictions."
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Quick Presets */}
+            {datePresets.slice(0, 3).map((preset) => (
+              <Button
+                key={preset.label}
+                variant={
+                  dateRange.from?.toDateString() === preset.from.toDateString() ? "default" : "outline"
+                }
+                size="sm"
+                onClick={() => setDateRange({ from: preset.from, to: preset.to })}
+              >
+                {preset.label}
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar mode="range" selected={dateRange} onSelect={(r) => r && setDateRange(r)} numberOfMonths={1} />
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
+            ))}
+
+            {/* Calendar Picker */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="min-w-[200px] justify-start text-left font-normal">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateRange.from && dateRange.to
+                    ? `${format(dateRange.from, "LLL dd")} – ${format(dateRange.to, "LLL dd")}`
+                    : "Custom range"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar mode="range" selected={dateRange} onSelect={(r) => r && setDateRange(r)} numberOfMonths={1} />
+              </PopoverContent>
+            </Popover>
+          </div>
+        }
+      />
 
       {/* ── SECTION 1: KPI Cards ─────────────────────────────────── */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -449,7 +460,7 @@ export default function AnalyticsPage() {
             icon: Percent,
           },
         ].map((card) => (
-          <Card key={card.title}>
+          <Card key={card.title} className="hover:-translate-y-1 transition-transform duration-300">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
               <card.icon className="h-4 w-4 text-muted-foreground" />
@@ -474,7 +485,10 @@ export default function AnalyticsPage() {
       </div>
 
       {/* ── SECTION 2: Revenue vs Predicted ──────────────────────── */}
-      <Card>
+      <Card className="relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+          <TrendingUp className="h-32 w-32" />
+        </div>
         <CardHeader>
           <CardTitle>Revenue: Actual vs Predicted</CardTitle>
           <CardDescription>
@@ -528,178 +542,229 @@ export default function AnalyticsPage() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        {/* ── SECTION 3: Top Selling Items (Horizontal Bar) ──────── */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Top 10 Items by Quantity</CardTitle>
-            <CardDescription>Click a bar to filter other charts to that item.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[400px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={topItems} layout="vertical" margin={{ top: 5, right: 30, bottom: 5, left: 100 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e5e7eb" />
-                  <XAxis
-                    type="number"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#6b7280", fontSize: 11 }}
-                  />
-                  <YAxis
-                    dataKey="name"
-                    type="category"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#374151", fontSize: 12 }}
-                    width={100}
-                  />
-                  <Tooltip
-                    cursor={{ fill: "#f3f4f6" }}
-                    contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
-                    formatter={(value: unknown, _name: any, props: any) => [
-                      `${value} units (₹${props.payload.revenue.toLocaleString()})`,
-                      "Sold",
-                    ]}
-                  />
-                  <Bar
-                    dataKey="quantity"
-                    radius={[0, 4, 4, 0]}
-                    cursor="pointer"
-                    onClick={(data: any) => {
-                      if (data && data.name) {
-                        setSelectedItem(selectedItem === data.name ? null : data.name);
-                      }
-                    }}
-                  >
-                    {topItems.map((item, index) => (
-                      <Cell
-                        key={item.name}
-                        fill={CATEGORY_COLORS[item.category] || PIE_COLORS[index % PIE_COLORS.length]}
-                        opacity={selectedItem && selectedItem !== item.name ? 0.3 : 1}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            {selectedItem && (
-              <div className="mt-2 text-center">
-                <Button variant="ghost" size="sm" onClick={() => setSelectedItem(null)}>
-                  Clear filter: {selectedItem}
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* ── Left Column: Insights & Mix (1 col) ── */}
+        <div className="flex flex-col gap-6">
+          
+          {/* Top Item Insight */}
+          {topItems.length > 0 && (
+            <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 shadow-md">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center text-primary uppercase tracking-wider">
+                  <Trophy className="h-4 w-4 mr-2" /> Top Performer
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-black truncate text-foreground">{topItems[0].name}</div>
+                <p className="text-sm text-muted-foreground mt-1 font-medium">Generated ₹{topItems[0].revenue.toLocaleString()} this period</p>
+                <Badge className="mt-4 bg-primary/20 text-primary hover:bg-primary/30 border-none shadow-sm">{topItems[0].category}</Badge>
+              </CardContent>
+            </Card>
+          )}
 
-        {/* ── SECTION 5: Category Breakdown (Pie Chart) ──────────── */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Revenue by Category</CardTitle>
-            <CardDescription>Share of revenue across food categories.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={categoryData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={110}
-                    innerRadius={55}
-                    dataKey="value"
-                    labelLine={false}
-                    label={renderPieLabel}
-                    stroke="none"
-                  >
-                    {categoryData.map((entry, index) => (
-                      <Cell
-                        key={entry.name}
-                        fill={CATEGORY_COLORS[entry.name] || PIE_COLORS[index % PIE_COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
-                    formatter={(value: unknown) => [`₹${(value as number)?.toLocaleString()}`, "Revenue"]}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            {/* Custom legend */}
-            <div className="grid grid-cols-2 gap-2 mt-4">
-              {categoryData.map((cat, i) => (
-                <div key={cat.name} className="flex items-center gap-2 text-sm">
-                  <div
-                    className="h-3 w-3 rounded-full shrink-0"
-                    style={{ backgroundColor: CATEGORY_COLORS[cat.name] || PIE_COLORS[i % PIE_COLORS.length] }}
-                  />
-                  <span className="text-muted-foreground truncate">{cat.name}</span>
-                  <span className="font-medium ml-auto">{cat.percentage}%</span>
+          {/* Peak Day Insight */}
+          {dailyRevenue.length > 0 && (
+            <Card className="border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-transparent">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center text-orange-500 uppercase tracking-wider">
+                  <Flame className="h-4 w-4 mr-2" /> Peak Sales Day
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {(() => {
+                  const peak = dailyRevenue.reduce((max, cur) => cur.actual > max.actual ? cur : max, dailyRevenue[0]);
+                  return (
+                    <>
+                      <div className="text-2xl font-black text-foreground">{peak.date}</div>
+                      <p className="text-sm text-muted-foreground mt-1 font-medium">₹{peak.actual.toLocaleString()} in revenue</p>
+                    </>
+                  );
+                })()}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ── SECTION 5: Category Breakdown (Donut) ──────────── */}
+          <Card className="flex-1">
+            <CardHeader>
+              <CardTitle>Revenue Mix</CardTitle>
+              <CardDescription>Category performance.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="relative h-[220px] w-full flex items-center justify-center">
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                  <span className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest">Total Rev</span>
+                  <span className="text-xl font-black text-primary mt-0.5">
+                    ₹{kpi.totalRevenue > 100000 ? (kpi.totalRevenue/1000).toFixed(0)+'k' : kpi.totalRevenue.toLocaleString()}
+                  </span>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* ── SECTION 4: Demand Heatmap ────────────────────────────── */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Demand Heatmap</CardTitle>
-          <CardDescription>Order volume by day of week over the last 4 weeks. Darker = more orders.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <div className="min-w-[500px]">
-              {/* Day labels */}
-              <div className="grid grid-cols-8 gap-2 mb-2">
-                <div className="text-xs text-muted-foreground font-medium" />
-                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-                  <div key={d} className="text-xs text-center font-medium text-muted-foreground">
-                    {d}
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={categoryData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={65}
+                      outerRadius={90}
+                      paddingAngle={3}
+                      dataKey="value"
+                      stroke="none"
+                      cornerRadius={4}
+                    >
+                      {categoryData.map((entry, index) => (
+                        <Cell
+                          key={entry.name}
+                          fill={CATEGORY_COLORS[entry.name] || PIE_COLORS[index % PIE_COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ borderRadius: "12px", border: "1px solid rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.85)", backdropFilter: "blur(12px)", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }}
+                      formatter={(value: unknown) => [`₹${(value as number)?.toLocaleString()}`, "Revenue"]}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="grid grid-cols-2 gap-y-3 gap-x-2 mt-6">
+                {categoryData.slice(0, 4).map((cat, i) => (
+                  <div key={cat.name} className="flex items-center gap-2 text-xs">
+                    <div
+                      className="h-2 w-2 rounded-full shrink-0 shadow-sm"
+                      style={{ backgroundColor: CATEGORY_COLORS[cat.name] || PIE_COLORS[i % PIE_COLORS.length] }}
+                    />
+                    <span className="text-muted-foreground truncate" title={cat.name}>{cat.name}</span>
+                    <span className="font-bold ml-auto">{cat.percentage}%</span>
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+        </div>
 
-              {/* Weeks */}
-              {[0, 1, 2, 3].map((week) => (
-                <div key={week} className="grid grid-cols-8 gap-2 mb-2">
-                  <div className="text-xs text-muted-foreground font-medium flex items-center justify-end pr-2">
-                    W{week + 1}
-                  </div>
-                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => {
-                    const cell = heatmapData.find((c) => c.week === week && c.day === day);
-                    return (
-                      <div
-                        key={`${week}-${day}`}
-                        className={cn(
-                          "aspect-square rounded-md flex items-center justify-center text-xs font-medium transition-colors cursor-default",
-                          cell ? getHeatmapColor(cell.value) : "bg-slate-50"
-                        )}
-                        title={cell ? `${cell.date}: ${cell.value} orders` : ""}
-                      >
-                        {cell?.value || ""}
+        {/* ── Right Column: Charts (2 cols) ── */}
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          {/* ── SECTION 3: Top Selling Items (Horizontal Bar) ──────── */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Top 10 Items by Quantity</CardTitle>
+              <CardDescription>Click a bar to filter other charts to that item.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[320px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={topItems} layout="vertical" margin={{ top: 5, right: 30, bottom: 5, left: 100 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e5e7eb" opacity={0.5} />
+                    <XAxis
+                      type="number"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#6b7280", fontSize: 11 }}
+                    />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#374151", fontSize: 12, fontWeight: 500 }}
+                      width={100}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "rgba(0,0,0,0.02)" }}
+                      contentStyle={{ borderRadius: "12px", border: "1px solid rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.85)", backdropFilter: "blur(12px)", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }}
+                      formatter={(value: unknown, _name: any, props: any) => [
+                        `${value} units (₹${props.payload.revenue.toLocaleString()})`,
+                        "Sold",
+                      ]}
+                    />
+                    <Bar
+                      dataKey="quantity"
+                      radius={[0, 4, 4, 0]}
+                      cursor="pointer"
+                      onClick={(data: any) => {
+                        if (data && data.name) {
+                          setSelectedItem(selectedItem === data.name ? null : data.name);
+                        }
+                      }}
+                    >
+                      {topItems.map((item, index) => (
+                        <Cell
+                          key={item.name}
+                          fill={CATEGORY_COLORS[item.category] || PIE_COLORS[index % PIE_COLORS.length]}
+                          opacity={selectedItem && selectedItem !== item.name ? 0.2 : 0.9}
+                          className="transition-opacity duration-300"
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              {selectedItem && (
+                <div className="mt-4 text-center">
+                  <Button variant="secondary" size="sm" onClick={() => setSelectedItem(null)} className="shadow-sm">
+                    Clear filter: {selectedItem}
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* ── SECTION 4: Demand Heatmap ────────────────────────────── */}
+          <Card className="flex-1">
+            <CardHeader>
+              <CardTitle>Demand Density Heatmap</CardTitle>
+              <CardDescription>Order volume by day of week over the last 4 weeks.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto pb-2">
+                <div className="min-w-[500px]">
+                  {/* Day labels */}
+                  <div className="grid grid-cols-8 gap-2 mb-3">
+                    <div className="text-xs text-muted-foreground font-medium" />
+                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
+                      <div key={d} className="text-xs text-center font-bold text-muted-foreground/70 uppercase tracking-wider">
+                        {d}
                       </div>
-                    );
-                  })}
-                </div>
-              ))}
+                    ))}
+                  </div>
 
-              {/* Legend */}
-              <div className="flex items-center justify-end gap-1 mt-4">
-                <span className="text-xs text-muted-foreground mr-2">Less</span>
-                {HEATMAP_COLORS.map((color, i) => (
-                  <div key={i} className={cn("h-4 w-4 rounded-sm", color)} />
-                ))}
-                <span className="text-xs text-muted-foreground ml-2">More</span>
+                  {/* Weeks */}
+                  {[0, 1, 2, 3].map((week) => (
+                    <div key={week} className="grid grid-cols-8 gap-2 mb-2">
+                      <div className="text-xs text-muted-foreground font-bold flex items-center justify-end pr-3 uppercase tracking-wider">
+                        W{week + 1}
+                      </div>
+                      {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => {
+                        const cell = heatmapData.find((c) => c.week === week && c.day === day);
+                        return (
+                          <div
+                            key={`${week}-${day}`}
+                            className={cn(
+                              "aspect-[2/1] rounded-md flex items-center justify-center text-xs font-bold transition-all duration-300 cursor-default hover:scale-105 shadow-sm",
+                              cell ? getHeatmapColor(cell.value) : "bg-slate-50"
+                            )}
+                            title={cell ? `${cell.date}: ${cell.value} orders` : ""}
+                          >
+                            {cell?.value || ""}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+
+                  {/* Legend */}
+                  <div className="flex items-center justify-end gap-1.5 mt-6 border-t pt-4 border-primary/5">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground mr-2">Low</span>
+                    {HEATMAP_COLORS.map((color, i) => (
+                      <div key={i} className={cn("h-3 w-6 rounded-sm shadow-inner", color)} />
+                    ))}
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground ml-2">High</span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -53,7 +53,7 @@ FORECAST_CACHE_TTL = 3600  # 1 hour in seconds
 
 def _cache_key(prefix: str, *parts: str) -> str:
     """Build a namespaced cache key."""
-    return f"{prefix}:{':'.join(str(p) for p in parts)}"
+    return f"{prefix}:{':'.join(parts)}"
 
 
 async def cache_get(key: str) -> dict | list | None:
@@ -169,6 +169,9 @@ async def check_rate_limit(
         results = await pipe.execute()
 
         current_count = results[0]
+        if not isinstance(current_count, int):
+            current_count = 1
+
         remaining = max(0, max_requests - current_count)
         is_allowed = current_count <= max_requests
 

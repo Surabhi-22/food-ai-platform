@@ -18,6 +18,7 @@ async def create_menu_item(
         category=body.category,
         price=body.price,
         cogs_percentage=body.cogs_percentage,
+        description=body.description,
         is_active=body.is_active,
     )
     db.add(item)

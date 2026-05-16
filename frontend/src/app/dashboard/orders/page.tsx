@@ -59,7 +59,10 @@ import {
 } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PremiumSkeleton } from "@/components/ui/premium-skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
+import { Receipt } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 
 /* ------------------------------------------------------------------ */
@@ -342,23 +345,23 @@ export default function OrdersPage() {
   /* ── Render ───────────────────────────────────────────────────── */
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8 animate-in fade-in duration-500">
       {/* Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Orders</h2>
-          <p className="text-muted-foreground">Manage and track all incoming orders.</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={exportCSV}>
-            <Download className="mr-2 h-4 w-4" />
-            Export CSV
-          </Button>
-          <Button size="sm" asChild>
-            <a href="/dashboard/orders/new">+ New Order</a>
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Orders"
+        description="Manage and track all incoming orders."
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={exportCSV}>
+              <Download className="mr-2 h-4 w-4" />
+              Export CSV
+            </Button>
+            <Button size="sm" asChild>
+              <a href="/dashboard/orders/new">+ New Order</a>
+            </Button>
+          </>
+        }
+      />
 
       {/* Filters */}
       <Card>
@@ -442,12 +445,12 @@ export default function OrdersPage() {
       </Card>
 
       {/* Data Table */}
-      <Card>
+      <Card className="overflow-hidden">
         <CardContent className="p-0">
           {isLoading ? (
             <div className="p-6 space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full" />
+                <PremiumSkeleton key={i} className="h-12 w-full" />
               ))}
             </div>
           ) : (
@@ -469,15 +472,24 @@ export default function OrdersPage() {
                 <TableBody>
                   {table.getRowModel().rows.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={columns.length} className="h-32 text-center text-muted-foreground">
-                        No orders found.
+                      <TableCell colSpan={columns.length} className="p-0">
+                        <EmptyState
+                          icon={Receipt}
+                          title="No orders found"
+                          description={search || statusFilter !== "all" || dateRange ? "No orders match your current filters." : "You haven't received any orders yet."}
+                          minHeight="min-h-[300px]"
+                          className="border-none shadow-none bg-transparent"
+                        />
                       </TableCell>
                     </TableRow>
                   ) : (
                     table.getRowModel().rows.map((row) => (
-                      <TableRow key={row.id}>
+                      <TableRow 
+                        key={row.id}
+                        className="hover:bg-primary/5 transition-colors cursor-pointer group"
+                      >
                         {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
+                          <TableCell key={cell.id} className="py-4">
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                           </TableCell>
                         ))}

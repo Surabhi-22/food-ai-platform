@@ -361,7 +361,7 @@ def add_event_features(df: pd.DataFrame) -> pd.DataFrame:
     dates = pd.to_datetime(df["date"]).dt.date
 
     # Use HolidayService for rich event features
-    event_features = dates.apply(holiday_service.get_event_features)
+    event_features = dates.apply(lambda d: holiday_service.get_event_features(d))
 
     df["is_festival"] = event_features.apply(lambda e: int(e.is_festival))
     df["is_public_holiday"] = event_features.apply(lambda e: int(e.is_public_holiday))
@@ -528,7 +528,7 @@ async def build_features(
     df = df.drop(columns=["festival_name", "temperature_category"], errors="ignore")
 
     # Final fill for any remaining NaNs
-    numeric_cols = df.select_dtypes(include=[np.number]).columns
+    numeric_cols = df.select_dtypes(include=["number"]).columns
     df[numeric_cols] = df[numeric_cols].fillna(0)
 
     feature_count = len([c for c in df.columns if c not in ["date", "menu_item_id"]])

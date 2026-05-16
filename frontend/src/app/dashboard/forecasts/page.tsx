@@ -38,8 +38,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { ForecastListResponse, ForecastItem, ForecastDateGroup } from "@/types/api";
+import { PremiumSkeleton } from "@/components/ui/premium-skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
+import { PackageOpen } from "lucide-react";
+import type { ForecastListResponse, ForecastItem, ForecastDateGroup } from "@/types/index";
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */
@@ -258,34 +261,32 @@ export default function ForecastsPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-10 w-48" />
-        <Skeleton className="h-[350px]" />
-        <Skeleton className="h-[400px]" />
+        <PremiumSkeleton className="h-10 w-48" />
+        <PremiumSkeleton className="h-[350px]" />
+        <PremiumSkeleton className="h-[400px]" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6" ref={forecastRef}>
+    <div className="space-y-6 pb-8 animate-in fade-in duration-500" ref={forecastRef}>
       {/* Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Demand Forecasts</h2>
-          <p className="text-muted-foreground">
-            ML-powered 3-day demand predictions with confidence intervals.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleRetrain} disabled={isRetraining}>
-            {isRetraining ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
-            Retrain Model
-          </Button>
-          <Button variant="outline" size="sm" onClick={exportPDF} disabled={isExporting}>
-            {isExporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-            Export PDF
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Demand Forecasts"
+        description="ML-powered 3-day demand predictions with confidence intervals."
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={handleRetrain} disabled={isRetraining}>
+              {isRetraining ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+              Retrain Model
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportPDF} disabled={isExporting}>
+              {isExporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+              Export PDF
+            </Button>
+          </>
+        }
+      />
 
       {/* Summary Cards */}
       {forecastData && (
@@ -351,7 +352,7 @@ export default function ForecastsPage() {
                 />
                 <Tooltip
                   contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
-                  formatter={(value: number | [number, number], name: string) => {
+                  formatter={(value: any, name: any) => {
                     if (name === "Confidence Range" && Array.isArray(value)) {
                       return [`${value[0]} – ${value[1]}`, name];
                     }
@@ -403,8 +404,14 @@ export default function ForecastsPage() {
             <TableBody>
               {tableItems.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                    No forecast data available. Trigger a model retrain to generate predictions.
+                  <TableCell colSpan={8} className="p-0">
+                    <EmptyState
+                      icon={PackageOpen}
+                      title="No forecast data"
+                      description="No forecast data available. Trigger a model retrain to generate predictions."
+                      minHeight="min-h-[200px]"
+                      className="border-none shadow-none bg-transparent"
+                    />
                   </TableCell>
                 </TableRow>
               ) : (

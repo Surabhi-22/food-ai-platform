@@ -76,8 +76,8 @@ def make_feature_df(n_days: int = 30, n_items: int = 3) -> pd.DataFrame:
         )
 
     # Add weather and event features
-    df["temperature"] = 25 + np.random.normal(0, 3, len(df))
-    df["rainfall"] = np.random.exponential(2, len(df))
+    df["temperature"] = list(25 + np.random.normal(0, 3, len(df)))
+    df["rainfall"] = list(np.random.exponential(2, len(df)))
     df["is_festival"] = 0
     df["days_to_next_festival"] = 15
 
@@ -150,7 +150,7 @@ class TestPreprocessing:
 
         assert scaler_loaded is not None
         np.testing.assert_array_almost_equal(
-            scaler_orig.data_min_, scaler_loaded.data_min_
+            list(scaler_orig.data_min_), list(scaler_loaded.data_min_)
         )
 
 
@@ -360,7 +360,7 @@ class TestXGBoost:
         train_xgboost(df, vendor_id, n_splits=3)
 
         available = [f for f in FEATURE_COLUMNS if f in df.columns]
-        X = df[available].values[:5]
+        X: np.ndarray = df[available].values[:5]
         preds = predict_xgboost(vendor_id, X)
 
         assert len(preds) == 5

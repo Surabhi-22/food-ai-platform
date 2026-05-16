@@ -124,9 +124,9 @@ def train_xgboost(
         y_pred = model.predict(X)
 
         metrics = {
-            "rmse": float(np.sqrt(mean_squared_error(y, y_pred))),
-            "mae": float(mean_absolute_error(y, y_pred)),
-            "mape": calculate_mape(y, y_pred),
+            "rmse": float(np.sqrt(mean_squared_error(np.asarray(y), np.asarray(y_pred)))),
+            "mae": float(mean_absolute_error(np.asarray(y), np.asarray(y_pred))),
+            "mape": calculate_mape(np.asarray(y), np.asarray(y_pred)),
         }
 
         save_model(vendor_id, model)
@@ -161,9 +161,9 @@ def train_xgboost(
         # Clip negative predictions to zero (demand cannot be negative)
         y_pred = np.maximum(y_pred, 0)
 
-        fold_rmse = float(np.sqrt(mean_squared_error(y_val, y_pred)))
-        fold_mae = float(mean_absolute_error(y_val, y_pred))
-        fold_mape = calculate_mape(y_val, y_pred)
+        fold_rmse = float(np.sqrt(mean_squared_error(np.asarray(y_val), np.asarray(y_pred))))
+        fold_mae = float(mean_absolute_error(np.asarray(y_val), np.asarray(y_pred)))
+        fold_mape = calculate_mape(np.asarray(y_val), np.asarray(y_pred))
 
         cv_results.append({
             "fold": fold + 1,
@@ -232,7 +232,8 @@ def predict_xgboost(
 
     if isinstance(X, pd.DataFrame):
         available_features = [f for f in FEATURE_COLUMNS if f in X.columns]
-        X = X[available_features].values
+        X_arr: np.ndarray = X[available_features].values
+        X = X_arr
 
     predictions = model.predict(X)
     return np.maximum(predictions, 0)  # Demand cannot be negative

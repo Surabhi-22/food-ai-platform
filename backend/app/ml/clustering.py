@@ -102,10 +102,8 @@ def compute_item_features(df: pd.DataFrame) -> pd.DataFrame:
     item_features["std_daily_quantity"] = item_features["std_daily_quantity"].fillna(0)
 
     # Coefficient of variation — measures demand regularity
-    item_features["cv"] = np.where(
-        item_features["mean_daily_quantity"] > 0,
-        item_features["std_daily_quantity"] / item_features["mean_daily_quantity"],
-        0,
+    item_features["cv"] = (item_features["std_daily_quantity"] / item_features["mean_daily_quantity"]).where(
+        item_features["mean_daily_quantity"] > 0, 0.0
     )
 
     logger.info("Computed clustering features for %d menu items", len(item_features))
@@ -187,14 +185,14 @@ def train_clusters(
     # Step 4: Map cluster indices to demand labels based on centroid means
     # Sort clusters by mean_daily_quantity centroid (index 1 in feature_cols)
     centroid_means = kmeans.cluster_centers_[:, 1]  # mean_daily_quantity column
-    sorted_indices = np.argsort(centroid_means)
+    sorted_indices = centroid_means.argsort()
 
     demand_levels = [DemandCluster.LOW_DEMAND, DemandCluster.MEDIUM_DEMAND, DemandCluster.HIGH_DEMAND]
     label_mapping = {}
     for rank, cluster_idx in enumerate(sorted_indices):
         label_mapping[int(cluster_idx)] = demand_levels[min(rank, len(demand_levels) - 1)]
 
-    item_features["cluster_id"] = cluster_labels
+    item_features["cluster_id"] = pd.Series(cluster_labels, index=item_features.index)
     item_features["demand_cluster"] = item_features["cluster_id"].map(
         {k: v.value for k, v in label_mapping.items()}
     )

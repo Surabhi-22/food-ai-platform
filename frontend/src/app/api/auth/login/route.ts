@@ -17,24 +17,34 @@ export async function POST(request: Request) {
 
     // FastAPI returns: { tokens: { access_token, refresh_token }, vendor: {...} }
     const accessToken = data?.tokens?.access_token;
+    const refreshToken = data?.tokens?.refresh_token;
 
-    if (!accessToken) {
+    if (!accessToken || !refreshToken) {
       return NextResponse.json(
-        { error: "Authentication failed: no token received from backend" },
+        { error: "Authentication failed: tokens not received from backend" },
         { status: 500 }
       );
     }
 
-    // Create response — return token in body so frontend can store it for API calls
+    // Create response — return tokens in body so frontend can store them
     const nextResponse = NextResponse.json(
-      { success: true, user: { email }, access_token: accessToken },
+      { success: true, user: { email }, access_token: accessToken, refresh_token: refreshToken },
       { status: 200 }
     );
 
-    // Set HTTPOnly cookie with JWT
+    // Set HTTPOnly cookies with JWTs
     nextResponse.cookies.set({
-      name: "auth_token",
+      name: "access_token",
       value: accessToken,
+      httpOnly: true,
+      path: "/",
+      sameSite: "lax",
+      maxAge: 60 * 60, // 1 hour
+    });
+
+    nextResponse.cookies.set({
+      name: "refresh_token",
+      value: refreshToken,
       httpOnly: true,
       path: "/",
       sameSite: "lax",

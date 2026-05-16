@@ -185,10 +185,10 @@ async def evaluate_forecasts(
         return {"status": "no_matches", "metrics": {}}
 
     # Calculate metrics
-    y_true_qty = merged["actual_quantity"].values
-    y_pred_qty = merged["predicted_quantity"].values
-    y_true_rev = merged["actual_revenue"].values
-    y_pred_rev = merged["predicted_revenue"].values
+    y_true_qty = np.asarray(merged["actual_quantity"].values, dtype=float)
+    y_pred_qty = np.asarray(merged["predicted_quantity"].values, dtype=float)
+    y_true_rev = np.asarray(merged["actual_revenue"].values, dtype=float)
+    y_pred_rev = np.asarray(merged["predicted_revenue"].values, dtype=float)
 
     metrics = {
         "quantity_rmse": calculate_rmse(y_true_qty, y_pred_qty),
@@ -242,8 +242,8 @@ async def evaluate_forecasts(
     # Per-item breakdown
     item_metrics = []
     for item_id, group in merged.groupby("menu_item_id"):
-        yt = group["actual_quantity"].values
-        yp = group["predicted_quantity"].values
+        yt = np.asarray(group["actual_quantity"].values, dtype=float)
+        yp = np.asarray(group["predicted_quantity"].values, dtype=float)
         item_metrics.append({
             "menu_item_id": item_id,
             "rmse": calculate_rmse(yt, yp),

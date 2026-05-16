@@ -7,15 +7,25 @@ import {
   Plus,
   Search,
   Trash2,
+  Pizza,
+  Coffee,
+  Beef,
+  UtensilsCrossed,
+  IceCream,
+  Sandwich,
 } from "lucide-react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-import { MenuItem, PaginatedResponse } from "@/types/api";
+import { MenuItem } from "@/types/index";
+import { PaginatedResponse } from "@/types/api";
 import { MenuService } from "@/services/menu.service";
 import { cn } from "@/lib/utils";
+import { PremiumSkeleton } from "@/components/ui/premium-skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,6 +83,17 @@ const CATEGORIES = [
 /* Component                                                           */
 /* ------------------------------------------------------------------ */
 
+const getCategoryIcon = (category: string) => {
+  const cat = category.toLowerCase();
+  if (cat.includes("beverage") || cat.includes("drink")) return <Coffee className="h-12 w-12 opacity-40 text-primary" />;
+  if (cat.includes("dessert") || cat.includes("sweet")) return <IceCream className="h-12 w-12 opacity-40 text-primary" />;
+  if (cat.includes("starter") || cat.includes("snack")) return <Sandwich className="h-12 w-12 opacity-40 text-primary" />;
+  if (cat.includes("main") || cat.includes("combo")) return <UtensilsCrossed className="h-12 w-12 opacity-40 text-primary" />;
+  if (cat.includes("pizza") || cat.includes("bread")) return <Pizza className="h-12 w-12 opacity-40 text-primary" />;
+  if (cat.includes("biryani") || cat.includes("meat")) return <Beef className="h-12 w-12 opacity-40 text-primary" />;
+  return <UtensilsCrossed className="h-12 w-12 opacity-40 text-primary" />;
+};
+
 export default function MenuPage() {
   // Data
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -98,9 +119,10 @@ export default function MenuPage() {
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<MenuItemFormValues>({
-    resolver: zodResolver(menuItemSchema),
+    resolver: zodResolver(menuItemSchema) as any,
   });
 
   /* ── Fetch Menu Items ─────────────────────────────────────────── */
@@ -109,8 +131,8 @@ export default function MenuPage() {
     const fetchMenu = async () => {
       try {
         const responseData = await MenuService.getMenuItems();
-        const data = Array.isArray(responseData) ? responseData : (responseData as PaginatedResponse<MenuItem>).data || [];
-        setMenuItems(data);
+        const data = (Array.isArray(responseData) ? responseData : (responseData as any).data) as unknown as MenuItem[];
+        setMenuItems(data || []);
       } catch (err) {
         console.error("Failed to fetch menu items", err);
         toast.error("Failed to load menu items");
@@ -179,7 +201,7 @@ export default function MenuPage() {
         const updatedItem = await MenuService.updateMenuItem(editingItem.id, data);
         // Replace with the server's response
         setMenuItems((prev) =>
-          prev.map((item) => (item.id === editingItem.id ? (updatedItem as MenuItem) : item))
+          prev.map((item) => (item.id === editingItem.id ? (updatedItem as unknown as MenuItem) : item))
         );
         toast.success(`${data.name} updated`);
         setFormDialog(false);
@@ -191,7 +213,7 @@ export default function MenuPage() {
     } else {
       try {
         const newItem = await MenuService.createMenuItem(data);
-        setMenuItems((prev) => [newItem as MenuItem, ...prev]);
+        setMenuItems((prev) => [newItem as unknown as MenuItem, ...prev]);
         toast.success(`${data.name} added to menu`);
         setFormDialog(false);
       } catch (err: unknown) {
@@ -255,18 +277,20 @@ export default function MenuPage() {
   /* ── Render ───────────────────────────────────────────────────── */
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Menu</h2>
-          <p className="text-muted-foreground">Manage your food items and categories.</p>
-        </div>
-        <Button onClick={openAddDialog}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Item
-        </Button>
-      </div>
+    <div className="space-y-6 pb-8 animate-in fade-in duration-500">
+      <div className="sticky top-0 z-10 p-4 rounded-xl shadow-sm space-y-4 mb-6 border border-primary/10 backdrop-blur-xl bg-background/80">
+        {/* Header */}
+        <PageHeader
+          title="Menu"
+          description="Manage your food items and categories."
+          actions={
+            <Button onClick={openAddDialog}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Item
+            </Button>
+          }
+          className="mb-0"
+        />
 
       {/* Filters */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -276,23 +300,25 @@ export default function MenuPage() {
             placeholder="Search menu items..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="pl-9 bg-background/50"
           />
         </div>
       </div>
 
-      {/* Category Tabs */}
-      <div className="flex items-center gap-2 flex-wrap">
-        {allCategories.map((cat) => (
-          <Button
-            key={cat}
-            variant={categoryFilter === cat ? "default" : "outline"}
-            size="sm"
-            onClick={() => setCategoryFilter(cat)}
-          >
-            {cat}
-          </Button>
-        ))}
+        {/* Category Tabs */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {allCategories.map((cat) => (
+            <Button
+              key={cat}
+              variant={categoryFilter === cat ? "default" : "outline"}
+              size="sm"
+              className={cn(categoryFilter === cat ? "shadow-md shadow-primary/20" : "")}
+              onClick={() => setCategoryFilter(cat)}
+            >
+              {cat}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* Menu Items Grid */}
@@ -301,72 +327,88 @@ export default function MenuPage() {
           {Array.from({ length: 8 }).map((_, i) => (
             <Card key={i}>
               <CardContent className="pt-6 space-y-3">
-                <div className="h-5 w-3/4 bg-muted rounded animate-pulse" />
-                <div className="h-4 w-1/2 bg-muted rounded animate-pulse" />
-                <div className="h-8 bg-muted rounded animate-pulse" />
+                <PremiumSkeleton className="h-5 w-3/4" />
+                <PremiumSkeleton className="h-4 w-1/2" />
+                <PremiumSkeleton className="h-8" />
               </CardContent>
             </Card>
           ))}
         </div>
       ) : filteredItems.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="text-muted-foreground">No menu items found.</p>
-            <Button variant="outline" className="mt-4" onClick={openAddDialog}>
+        <EmptyState
+          icon={UtensilsCrossed}
+          title="No menu items found"
+          description={search || categoryFilter !== "All" ? "Try adjusting your search or filters." : "You haven't added any menu items yet."}
+          action={
+            <Button onClick={openAddDialog}>
               <Plus className="mr-2 h-4 w-4" /> Add your first item
             </Button>
-          </CardContent>
-        </Card>
+          }
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredItems.map((item) => (
             <Card
               key={item.id}
               className={cn(
-                "relative group transition-all hover:shadow-md",
-                !item.is_active && "opacity-60"
+                "group overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
+                !item.is_active && "opacity-60 grayscale-[0.5]"
               )}
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <CardTitle className="text-base truncate">{item.name}</CardTitle>
-                    <CardDescription>{item.category}</CardDescription>
-                  </div>
-                  <Badge variant={item.is_active ? "success" : "secondary"} className="shrink-0 ml-2">
+              {/* Image/Icon Header */}
+              <div className="relative h-32 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border-b">
+                {getCategoryIcon(item.category)}
+                
+                {/* Price Badge */}
+                <div className="absolute top-3 right-3">
+                  <Badge variant="default" className="text-sm font-bold shadow-md bg-primary/90 text-primary-foreground border-none">
+                    ₹{item.price.toLocaleString()}
+                  </Badge>
+                </div>
+                
+                {/* Status Badge */}
+                <div className="absolute top-3 left-3">
+                  <Badge variant={item.is_active ? "success" : "secondary"} className="shadow-sm">
                     {item.is_active ? "Active" : "Inactive"}
                   </Badge>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-end justify-between">
+              </div>
+
+              <CardContent className="pt-4 pb-4">
+                <div className="mb-4">
+                  <h3 className="font-bold text-lg truncate" title={item.name}>{item.name}</h3>
+                  <p className="text-sm text-muted-foreground">{item.category}</p>
+                </div>
+
+                <div className="flex items-end justify-between mt-auto">
                   <div>
-                    <p className="text-2xl font-bold text-primary">
-                      ₹{item.price.toLocaleString()}
-                    </p>
-                    {item.cogs_percentage != null && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        COGS: {item.cogs_percentage}% · Margin: {(100 - item.cogs_percentage).toFixed(0)}%
-                      </p>
+                    {item.cogs_percentage != null ? (
+                      <div className="text-xs space-y-1">
+                        <p className="text-muted-foreground">Margin: <span className="text-foreground font-medium">{(100 - item.cogs_percentage).toFixed(0)}%</span></p>
+                        <p className="text-muted-foreground">COGS: {item.cogs_percentage}%</p>
+                      </div>
+                    ) : (
+                      <div className="h-8"></div>
                     )}
                   </div>
-                  <div className="flex items-center gap-1">
+                  
+                  <div className="flex items-center gap-1 bg-muted/30 rounded-full p-1 border">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8"
+                      className="h-8 w-8 rounded-full"
                       onClick={() => toggleActive(item)}
                       title={item.is_active ? "Deactivate" : "Activate"}
                     >
                       <div
                         className={cn(
-                          "h-4 w-8 rounded-full transition-colors relative",
-                          item.is_active ? "bg-success" : "bg-muted"
+                          "h-5 w-9 rounded-full transition-colors relative shadow-inner",
+                          item.is_active ? "bg-primary" : "bg-muted-foreground/30"
                         )}
                       >
                         <div
                           className={cn(
-                            "absolute top-0.5 h-3 w-3 rounded-full bg-white transition-transform shadow-sm",
+                            "absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all shadow-sm",
                             item.is_active ? "translate-x-4" : "translate-x-0.5"
                           )}
                         />
@@ -375,7 +417,7 @@ export default function MenuPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8"
+                      className="h-8 w-8 rounded-full hover:bg-primary/10 hover:text-primary"
                       onClick={() => openEditDialog(item)}
                     >
                       <Edit2 className="h-4 w-4" />
@@ -383,7 +425,7 @@ export default function MenuPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive"
                       onClick={() => setDeleteDialog({ open: true, item })}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -398,7 +440,7 @@ export default function MenuPage() {
 
       {/* Add / Edit Dialog */}
       <Dialog open={formDialog} onOpenChange={setFormDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md border-none shadow-2xl">
           <DialogHeader>
             <DialogTitle>{editingItem ? "Edit Menu Item" : "Add New Item"}</DialogTitle>
             <DialogDescription>
@@ -427,8 +469,8 @@ export default function MenuPage() {
             <div className="space-y-2">
               <Label>Category</Label>
               <Select
-                defaultValue={editingItem?.category || ""}
-                onValueChange={(val) => setValue("category", val)}
+                value={watch("category") || ""}
+                onValueChange={(val) => setValue("category", val, { shouldValidate: true })}
               >
                 <SelectTrigger className={errors.category ? "border-destructive" : ""}>
                   <SelectValue placeholder="Select a category" />
@@ -503,7 +545,7 @@ export default function MenuPage() {
         open={deleteDialog.open}
         onOpenChange={(open) => !open && setDeleteDialog({ open: false, item: null })}
       >
-        <DialogContent>
+        <DialogContent className="border-none shadow-2xl">
           <DialogHeader>
             <DialogTitle>Delete &quot;{deleteDialog.item?.name}&quot;?</DialogTitle>
             <DialogDescription>

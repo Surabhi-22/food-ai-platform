@@ -5,6 +5,8 @@ import { format } from "date-fns";
 import {
   Bot,
   MessageSquarePlus,
+  Mic,
+  MicOff,
   Send,
   Sparkles,
   Trash2,
@@ -51,6 +53,10 @@ export default function AIChatPage() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
 
+  // Voice state
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
   // Chat sessions
   const [sessions, setSessions] = useState<ChatSessionSummary[]>([]);
   const [isLoadingSessions, setIsLoadingSessions] = useState(true);
@@ -70,15 +76,63 @@ export default function AIChatPage() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
+  /* ── Voice Assistant Setup ────────────────────────────────────── */
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.interimResults = false;
+        recognitionRef.current.lang = "en-US";
+
+        recognitionRef.current.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          setInputValue(transcript);
+          setIsListening(false);
+          toast.success("Speech captured!");
+        };
+
+        recognitionRef.current.onerror = (event: any) => {
+          console.error("Speech recognition error", event.error);
+          setIsListening(false);
+          toast.error("Speech recognition failed: " + event.error);
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+      }
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      toast.error("Speech recognition is not supported in your browser.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      setInputValue("");
+      recognitionRef.current.start();
+      setIsListening(true);
+      toast.info("Listening...");
+    }
+  };
+
   /* ── Load Sessions ────────────────────────────────────────────── */
 
   const loadSessions = useCallback(async () => {
     setIsLoadingSessions(true);
     try {
-      const res = await api.get("/chat/sessions");
-      const data = res.data?.sessions || [];
+      const data = await ChatService.getSessions();
+      const sessionList = data.sessions || [];
       setSessions(
-        data.map((s: any) => ({
+        sessionList.map((s: any) => ({
           id: s.id,
           preview: s.preview || "New conversation",
           created_at: s.created_at || s.updated_at,
@@ -93,7 +147,6 @@ export default function AIChatPage() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadSessions();
   }, [loadSessions]);
 
@@ -101,8 +154,7 @@ export default function AIChatPage() {
 
   const loadSession = async (id: string) => {
     try {
-      const res = await api.get(`/chat/history?session_id=${id}`);
-      const data = res.data;
+      const data = await ChatService.getHistory(id);
 
       const loadedMessages: Message[] = (data.messages || []).map((m: any, i: number) => ({
         id: `${id}-${i}`,
@@ -157,25 +209,32 @@ export default function AIChatPage() {
     setIsStreaming(true);
 
     try {
-      // Send question to backend
-      const reply = await ChatService.sendMessage(text);
+      // Send question to backend with current sessionId
+      const reply = await ChatService.sendMessage(text, sessionId);
       
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantMsgId
             ? {
                 ...m,
-                content: reply.response || reply.answer || reply.reply || reply.content || "I'm sorry, I couldn't understand that.",
+                content: reply.reply || "I'm sorry, I couldn't understand that.",
                 isStreaming: false,
-                sources: reply.sources || [],
+                sources: (reply.source_chunks || []).map((chunk: any) => ({
+                  content: chunk.text,
+                  score: chunk.score,
+                  metadata: {
+                    data_type: chunk.data_type,
+                    item_name: chunk.item_name,
+                  }
+                })),
               }
             : m
         )
       );
       
-      // Update session if it's the first message
-      if (!sessionId) {
-        setSessionId(`session-${crypto.randomUUID()}`);
+      // Update session if it's the first message or if backend returned a new ID
+      if (reply.session_id && sessionId !== reply.session_id) {
+        setSessionId(reply.session_id);
         loadSessions();
       }
     } catch (err: unknown) {
@@ -200,9 +259,7 @@ export default function AIChatPage() {
 
   const clearHistory = async () => {
     try {
-      if (sessionId) {
-        await api.delete(`/chat/history?session_id=${sessionId}`);
-      }
+      await ChatService.clearHistory(sessionId);
       startNewChat();
       loadSessions();
       toast.success("Chat history cleared");
@@ -223,14 +280,14 @@ export default function AIChatPage() {
   /* ── Render ───────────────────────────────────────────────────── */
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] gap-0 rounded-xl border bg-white shadow-sm overflow-hidden">
+    <div className="flex h-[calc(100vh-8rem)] gap-0 rounded-xl border glass-card shadow-lg overflow-hidden relative">
       {/* ── Left Sidebar ─────────────────────────────────────────── */}
       <div className="hidden md:flex md:w-[30%] flex-col border-r bg-slate-50/50">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b">
+        <div className="flex items-center justify-between px-4 py-4 border-b border-primary/10">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-indigo-500" />
-            <span className="text-sm font-semibold">AI Assistant</span>
+            <Sparkles className="h-5 w-5 text-primary" />
+            <span className="text-sm font-bold tracking-tight">AI Assistant</span>
           </div>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={startNewChat}>
             <MessageSquarePlus className="h-4 w-4" />
@@ -246,7 +303,7 @@ export default function AIChatPage() {
                 key={prompt}
                 onClick={() => sendMessage(prompt)}
                 disabled={isStreaming}
-                className="text-left text-xs px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="text-left text-[11px] font-medium px-3 py-2 rounded-lg bg-background/50 border border-primary/10 text-muted-foreground hover:border-primary/30 hover:bg-primary/5 hover:text-primary transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
                 {prompt}
               </button>
@@ -307,15 +364,15 @@ export default function AIChatPage() {
       {/* ── Right Panel (Chat Area) ──────────────────────────────── */}
       <div className="flex flex-1 flex-col">
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto px-4 lg:px-6 py-4 space-y-4">
+        <div className="flex-1 overflow-y-auto px-4 lg:px-6 pt-4 pb-40 space-y-4">
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg">
-                <Bot className="h-8 w-8 text-white" />
+            <div className="flex flex-col items-center justify-center h-full text-center gap-6">
+              <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-2xl ring-4 ring-primary/10 animate-in fade-in zoom-in duration-700">
+                <Bot className="h-12 w-12 text-white" />
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-800">FoodAI Assistant</h3>
-                <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+              <div className="space-y-2">
+                <h3 className="text-3xl font-black tracking-tight bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">FoodAI Assistant</h3>
+                <p className="text-base text-muted-foreground max-w-md mx-auto font-medium">
                   Ask me anything about your business — sales trends, demand forecasts, menu performance, and inventory insights. I use your real data to answer.
                 </p>
               </div>
@@ -338,45 +395,63 @@ export default function AIChatPage() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Bar */}
-        <div className="border-t bg-white px-4 lg:px-6 py-3">
-          <div className="flex items-end gap-2">
-            <div className="relative flex-1">
-              <textarea
-                ref={inputRef}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask about your business data..."
-                disabled={isStreaming}
-                rows={1}
-                className={cn(
-                  "w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-sm",
-                  "placeholder:text-muted-foreground",
-                  "focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
-                  "transition-all"
-                )}
-                style={{ minHeight: "44px", maxHeight: "120px" }}
-                onInput={(e) => {
-                  const target = e.target as HTMLTextAreaElement;
-                  target.style.height = "auto";
-                  target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
-                }}
-              />
+        {/* Input Floating Dock */}
+        <div className="absolute bottom-0 left-0 right-0 md:left-[30%] pointer-events-none">
+          <div className="bg-gradient-to-t from-background via-background/90 to-transparent pt-12 pb-4 px-4 lg:px-8">
+            <div className="max-w-4xl mx-auto pointer-events-auto">
+              <div className="glass-card flex items-end gap-2 p-2 rounded-2xl shadow-xl border-primary/20 backdrop-blur-xl bg-background/80">
+                
+                {/* Voice button */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleListening}
+                  className={cn(
+                    "h-11 w-11 rounded-xl shrink-0 transition-all",
+                    isListening ? "text-red-500 bg-red-50 animate-pulse" : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+                  )}
+                >
+                  {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                </Button>
+
+                <div className="relative flex-1">
+                  <textarea
+                    ref={inputRef}
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder={isListening ? "Listening..." : "Ask about your business data..."}
+                    disabled={isStreaming}
+                    rows={1}
+                    className={cn(
+                      "w-full resize-none bg-transparent px-4 py-3 text-sm font-medium",
+                      "placeholder:text-muted-foreground/60",
+                      "focus:outline-none",
+                      "disabled:opacity-50 disabled:cursor-not-allowed",
+                      "scrollbar-none"
+                    )}
+                    style={{ minHeight: "44px", maxHeight: "150px" }}
+                    onInput={(e) => {
+                      const target = e.target as HTMLTextAreaElement;
+                      target.style.height = "auto";
+                      target.style.height = `${Math.min(target.scrollHeight, 150)}px`;
+                    }}
+                  />
+                </div>
+                <Button
+                  onClick={() => sendMessage()}
+                  disabled={!inputValue.trim() || isStreaming}
+                  size="icon"
+                  className="h-11 w-11 rounded-xl bg-primary hover:bg-primary/90 shrink-0 shadow-sm transition-transform hover:scale-105"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-2 text-center font-medium uppercase tracking-widest">
+                Press Enter to send · Use {recognitionRef.current ? "Mic" : "Text"} for voice · Powered by GPT-4o
+              </p>
             </div>
-            <Button
-              onClick={() => sendMessage()}
-              disabled={!inputValue.trim() || isStreaming}
-              size="icon"
-              className="h-11 w-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 shrink-0"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
           </div>
-          <p className="text-[10px] text-muted-foreground mt-1.5 text-center">
-            Press Enter to send · Shift+Enter for new line · Powered by GPT-4o + RAG
-          </p>
         </div>
       </div>
     </div>

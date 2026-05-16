@@ -54,44 +54,9 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
-    // 401 Unauthorized → try to refresh token
+    // 401 Unauthorized — do not redirect, just reject silently
     if (error.response?.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        // Queue this request until refresh completes
-        return new Promise((resolve, reject) => {
-          failedQueue.push({
-            resolve: (token: string) => {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-              resolve(api(originalRequest));
-            },
-            reject: (err) => reject(err),
-          });
-        });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        const res = await nextApi.post("/auth/refresh");
-        const newToken = res.data?.access_token;
-
-        if (newToken) {
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          processQueue(null, newToken);
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
-        processQueue(refreshError, null);
-        // Redirect to login
-        if (typeof window !== "undefined") {
-          toast.error("Session expired. Please log in again.");
-          window.location.href = "/login";
-        }
-        return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
-      }
+      return Promise.reject(error);
     }
 
     // 403 Forbidden → redirect to dashboard with message
