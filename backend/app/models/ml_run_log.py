@@ -34,7 +34,7 @@ class MLRunLog(Base, UUIDPrimaryKeyMixin):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
     status: Mapped[MLRunStatus] = mapped_column(
-        Enum(MLRunStatus, name="ml_run_status", create_constraint=True, native_enum=True),
+        Enum(MLRunStatus, name="ml_run_status", create_constraint=True, native_enum=True, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         server_default=MLRunStatus.PENDING.value,
     )

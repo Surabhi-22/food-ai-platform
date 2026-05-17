@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import {
   AlertTriangle,
@@ -39,6 +40,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 
 export default function DashboardOverview() {
+  const router = useRouter();
   const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -143,7 +145,22 @@ export default function DashboardOverview() {
         description="Your real-time business metrics and AI demand forecasts."
         actions={
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => {
+              const rows = [
+                ["Metric", "Value"],
+                ["Est. 3-Day Revenue", `₹${analytics?.total_revenue_3day?.toLocaleString() || '0'}`],
+                ["Total Predicted Demand", `${analytics?.total_quantity_3day || 0} units`],
+                ["Est. Profit Margin", `₹${((analytics?.total_revenue_3day || 0) * 0.42).toLocaleString()}`],
+              ];
+              const csv = rows.map(r => r.join(",")).join("\n");
+              const blob = new Blob([csv], { type: "text/csv" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `dashboard_export_${new Date().toISOString().slice(0,10)}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}>
               <Download className="mr-2 h-4 w-4" />
               Export
             </Button>
@@ -339,7 +356,7 @@ export default function DashboardOverview() {
               <CardTitle>Recent Orders</CardTitle>
               <CardDescription>Live feed of incoming restaurant orders.</CardDescription>
             </div>
-            <Button variant="ghost" size="sm" className="hidden sm:flex">View all</Button>
+            <Button variant="ghost" size="sm" className="hidden sm:flex" onClick={() => router.push('/dashboard/orders')}>View all</Button>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -399,7 +416,7 @@ export default function DashboardOverview() {
                     </div>
                   </div>
                 ))}
-                <Button variant="outline" className="w-full mt-2 text-xs">View Inventory</Button>
+                <Button variant="outline" className="w-full mt-2 text-xs" onClick={() => router.push('/dashboard/inventory')}>View Inventory</Button>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-8 text-center">

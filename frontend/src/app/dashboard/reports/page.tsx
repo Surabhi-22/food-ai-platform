@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
+import { toast } from "sonner";
 import {
   FileText,
   Download,
@@ -531,7 +532,7 @@ export default function ReportsPage() {
         title="Business Reports"
         description="Access and generate detailed analytical reports for your business performance."
         actions={
-          <Button>
+          <Button onClick={() => toast.success('Report generation started. It will appear in the list when ready.')}>
             <FileText className="mr-2 h-4 w-4" />
             Generate New Report
           </Button>
@@ -588,10 +589,10 @@ export default function ReportsPage() {
           Available Reports
         </h3>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={() => toast.info('Filter feature coming soon')}>
             <Filter className="mr-2 h-4 w-4" /> Filter
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={() => toast.info('Date range filter coming soon')}>
             <Calendar className="mr-2 h-4 w-4" /> Date Range
           </Button>
         </div>

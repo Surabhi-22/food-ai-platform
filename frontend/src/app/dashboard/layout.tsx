@@ -133,7 +133,10 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-4">
-            <button className="text-muted-foreground hover:text-foreground relative">
+            <button
+              className="text-muted-foreground hover:text-foreground relative"
+              onClick={() => { window.location.href = '/dashboard/orders'; }}
+            >
               <Bell className="h-5 w-5" />
               <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground">
                 3

@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "https://food-ai-project.vercel.app",  # Production Next.js domain
+        "https://food-ai-platform.vercel.app",  # Production Next.js domain
     ]
 
     @field_validator("CORS_ORIGINS", mode="before")

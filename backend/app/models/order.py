@@ -32,7 +32,7 @@ class Order(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         UUID(as_uuid=True), ForeignKey("customers.id", ondelete="SET NULL"), nullable=True, index=True
     )
     status: Mapped[OrderStatus] = mapped_column(
-        Enum(OrderStatus, name="order_status", create_constraint=True, native_enum=True),
+        Enum(OrderStatus, name="order_status", create_constraint=True, native_enum=True, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         server_default=OrderStatus.PENDING.value,
         index=True,
