@@ -116,7 +116,7 @@ export default function InventoryPage() {
       });
       setStockInputs(inputs);
     } catch {
-      toast.error("Failed to load inventory data");
+      console.debug("Failed to load inventory data — backend unreachable");
     } finally {
       setIsLoading(false);
     }

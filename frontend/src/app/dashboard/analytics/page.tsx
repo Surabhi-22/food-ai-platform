@@ -203,40 +203,65 @@ export default function AnalyticsPage() {
   /* ── Generate analytics data from API (falls back to demo data) ── */
 
   const generateDemoData = useCallback(() => {
-    const days = 30;
+    const from = dateRange.from || subDays(new Date(), 30);
+    const to = dateRange.to || new Date();
+    const dayCount = Math.max(1, Math.round((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)));
 
-    // KPIs
-    setKpi({
-      totalRevenue: 847500,
-      totalOrders: 1284,
-      avgOrderValue: 660,
-      profitMargin: 68,
-      revenueChange: 12.5,
-      ordersChange: 8.3,
-      aovChange: 3.2,
-      marginChange: -1.5,
-    });
+    // Seeded pseudo-random based on a date string for consistent results per date
+    const seed = (s: string) => {
+      let h = 0;
+      for (let i = 0; i < s.length; i++) {
+        h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+      }
+      return () => {
+        h = (h ^ (h >>> 16)) * 0x45d9f3b;
+        h = (h ^ (h >>> 16)) * 0x45d9f3b;
+        h = h ^ (h >>> 16);
+        return (h >>> 0) / 4294967296;
+      };
+    };
 
-    // Daily revenue
+    // Daily revenue data scoped to the actual date range
     const daily: DailyRevenue[] = [];
-    for (let i = days; i >= 0; i--) {
-      const d = subDays(new Date(), i);
-      const base = 20000 + Math.random() * 15000;
+    let totalRev = 0;
+    let totalOrd = 0;
+    for (let i = 0; i <= dayCount; i++) {
+      const d = new Date(from.getTime() + i * 86400000);
+      const rng = seed(format(d, "yyyy-MM-dd"));
+      const base = 18000 + rng() * 16000;
       const dow = d.getDay();
-      const multiplier = dow === 0 || dow === 6 ? 1.3 : 1;
+      const multiplier = dow === 0 || dow === 6 ? 1.35 : 1;
       const actual = Math.round(base * multiplier);
-      const predicted = Math.round(actual * (0.92 + Math.random() * 0.16));
+      const predicted = Math.round(actual * (0.88 + rng() * 0.2));
       daily.push({
         date: format(d, "MMM dd"),
         actual,
         predicted,
         variance: Math.round(((actual - predicted) / predicted) * 100),
       });
+      totalRev += actual;
+      totalOrd += Math.round(30 + rng() * 45);
     }
     setDailyRevenue(daily);
 
-    // Top items
-    const items: TopItem[] = [
+    // KPIs scale with date range
+    const aov = totalOrd > 0 ? Math.round(totalRev / totalOrd) : 0;
+    const revenueChange = dayCount <= 7 ? 8.7 : dayCount <= 17 ? 12.5 : dayCount <= 31 ? 15.2 : 18.3;
+    const ordersChange = dayCount <= 7 ? 5.1 : dayCount <= 17 ? 8.3 : dayCount <= 31 ? 11.7 : 14.6;
+    setKpi({
+      totalRevenue: totalRev,
+      totalOrders: totalOrd,
+      avgOrderValue: aov,
+      profitMargin: dayCount <= 7 ? 71 : dayCount <= 17 ? 68 : 65,
+      revenueChange,
+      ordersChange,
+      aovChange: dayCount <= 7 ? 1.8 : 3.2,
+      marginChange: dayCount <= 7 ? 0.5 : -1.5,
+    });
+
+    // Top items — quantities scale with day count
+    const itemMultiplier = dayCount / 30;
+    const baseItems: TopItem[] = [
       { name: "Chicken Biryani", category: "Biryani", quantity: 342, revenue: 51300 },
       { name: "Paneer Butter Masala", category: "Main Course", quantity: 289, revenue: 40460 },
       { name: "Masala Dosa", category: "Main Course", quantity: 265, revenue: 21200 },
@@ -248,11 +273,16 @@ export default function AnalyticsPage() {
       { name: "Samosa", category: "Snacks", quantity: 156, revenue: 4680 },
       { name: "Mango Lassi", category: "Beverages", quantity: 143, revenue: 8580 },
     ];
-    setTopItems(items);
+    const scaledItems = baseItems.map((item) => ({
+      ...item,
+      quantity: Math.round(item.quantity * itemMultiplier),
+      revenue: Math.round(item.revenue * itemMultiplier),
+    }));
+    setTopItems(scaledItems);
 
-    // Category breakdown
+    // Category breakdown from scaled items
     const cats: Record<string, number> = {};
-    items.forEach((item) => {
+    scaledItems.forEach((item) => {
       cats[item.category] = (cats[item.category] || 0) + item.revenue;
     });
     const totalCatRev = Object.values(cats).reduce((a, b) => a + b, 0);
@@ -266,13 +296,16 @@ export default function AnalyticsPage() {
         .sort((a, b) => b.value - a.value)
     );
 
-    // Heatmap
+    // Heatmap — scope to actual weeks in range
     const heatmap: HeatmapCell[] = [];
     const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    for (let week = 0; week < 4; week++) {
+    const weeksToShow = Math.min(4, Math.ceil(dayCount / 7));
+    for (let week = 0; week < weeksToShow; week++) {
       for (let day = 0; day < 7; day++) {
-        const d = subDays(new Date(), (3 - week) * 7 + (6 - day));
-        const base = 30 + Math.random() * 50;
+        const d = new Date(to.getTime() - ((weeksToShow - 1 - week) * 7 + (6 - day)) * 86400000);
+        if (d < from || d > to) continue;
+        const rng = seed(format(d, "yyyy-MM-dd") + "heatmap");
+        const base = 30 + rng() * 50;
         const isWeekend = day >= 5;
         heatmap.push({
           day: dayNames[day],
@@ -283,7 +316,7 @@ export default function AnalyticsPage() {
       }
     }
     setHeatmapData(heatmap);
-  }, []);
+  }, [dateRange]);
 
   const fetchAnalytics = useCallback(async () => {
     setIsLoading(true);
@@ -434,54 +467,65 @@ export default function AnalyticsPage() {
 
       {/* ── SECTION 1: KPI Cards ─────────────────────────────────── */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[
-          {
-            title: "Total Revenue (MTD)",
-            value: `₹${kpi.totalRevenue.toLocaleString()}`,
-            change: kpi.revenueChange,
-            icon: IndianRupee,
-          },
-          {
-            title: "Total Orders (MTD)",
-            value: kpi.totalOrders.toLocaleString(),
-            change: kpi.ordersChange,
-            icon: ShoppingBag,
-          },
-          {
-            title: "Avg Order Value",
-            value: `₹${Math.round(kpi.avgOrderValue).toLocaleString()}`,
-            change: kpi.aovChange,
-            icon: DollarSign,
-          },
-          {
-            title: "Profit Margin",
-            value: `${kpi.profitMargin}%`,
-            change: kpi.marginChange,
-            icon: Percent,
-          },
-        ].map((card) => (
-          <Card key={card.title} className="hover:-translate-y-1 transition-transform duration-300">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-              <card.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{card.value}</div>
-              <p className="text-xs text-muted-foreground mt-1 flex items-center">
-                {card.change >= 0 ? (
-                  <ArrowUpRight className="mr-1 h-4 w-4 text-emerald-500" />
-                ) : (
-                  <ArrowDownRight className="mr-1 h-4 w-4 text-red-500" />
-                )}
-                <span className={cn("font-medium", card.change >= 0 ? "text-emerald-500" : "text-red-500")}>
-                  {card.change >= 0 ? "+" : ""}
-                  {card.change}%
-                </span>
-                <span className="ml-1">vs last month</span>
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+        {(() => {
+          const from = dateRange.from || subDays(new Date(), 30);
+          const to = dateRange.to || new Date();
+          const days = Math.round((to.getTime() - from.getTime()) / 86400000);
+          const periodLabel = days <= 7 ? "(7D)" : days <= 17 ? "(MTD)" : days <= 31 ? "(30D)" : `(${days}D)`;
+          const compLabel = days <= 7 ? "vs prior week" : days <= 31 ? "vs last month" : "vs prior period";
+          return [
+            {
+              title: `Total Revenue ${periodLabel}`,
+              value: `₹${kpi.totalRevenue.toLocaleString()}`,
+              change: kpi.revenueChange,
+              icon: IndianRupee,
+              comp: compLabel,
+            },
+            {
+              title: `Total Orders ${periodLabel}`,
+              value: kpi.totalOrders.toLocaleString(),
+              change: kpi.ordersChange,
+              icon: ShoppingBag,
+              comp: compLabel,
+            },
+            {
+              title: "Avg Order Value",
+              value: `₹${Math.round(kpi.avgOrderValue).toLocaleString()}`,
+              change: kpi.aovChange,
+              icon: DollarSign,
+              comp: compLabel,
+            },
+            {
+              title: "Profit Margin",
+              value: `${kpi.profitMargin}%`,
+              change: kpi.marginChange,
+              icon: Percent,
+              comp: compLabel,
+            },
+          ].map((card) => (
+            <Card key={card.title} className="hover:-translate-y-1 transition-transform duration-300">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+                <card.icon className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{card.value}</div>
+                <p className="text-xs text-muted-foreground mt-1 flex items-center">
+                  {card.change >= 0 ? (
+                    <ArrowUpRight className="mr-1 h-4 w-4 text-emerald-500" />
+                  ) : (
+                    <ArrowDownRight className="mr-1 h-4 w-4 text-red-500" />
+                  )}
+                  <span className={cn("font-medium", card.change >= 0 ? "text-emerald-500" : "text-red-500")}>
+                    {card.change >= 0 ? "+" : ""}
+                    {card.change}%
+                  </span>
+                  <span className="ml-1">{card.comp}</span>
+                </p>
+              </CardContent>
+            </Card>
+          ));
+        })()}
       </div>
 
       {/* ── SECTION 2: Revenue vs Predicted ──────────────────────── */}

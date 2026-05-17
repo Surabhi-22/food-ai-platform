@@ -116,8 +116,7 @@ export default function OrdersPage() {
       const data = Array.isArray(res.data) ? res.data : (res.data as unknown as { orders: Order[] }).orders || [];
       setOrders(data);
     } catch (err) {
-      console.error("Failed to fetch orders", err);
-      toast.error("Failed to load orders");
+      console.debug("Failed to fetch orders", err);
     } finally {
       setIsLoading(false);
     }

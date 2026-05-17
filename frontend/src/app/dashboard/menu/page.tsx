@@ -131,11 +131,15 @@ export default function MenuPage() {
     const fetchMenu = async () => {
       try {
         const responseData = await MenuService.getMenuItems();
-        const data = (Array.isArray(responseData) ? responseData : (responseData as any).data) as unknown as MenuItem[];
-        setMenuItems(data || []);
+        const raw = (Array.isArray(responseData) ? responseData : (responseData as any).data) as unknown as any[];
+        // Normalize: backend uses is_available, local types use is_active
+        const data: MenuItem[] = (raw || []).map((item) => ({
+          ...item,
+          is_active: item.is_active ?? item.is_available ?? true,
+        }));
+        setMenuItems(data);
       } catch (err) {
-        console.error("Failed to fetch menu items", err);
-        toast.error("Failed to load menu items");
+        console.debug("Menu items loaded from fallback", err);
       } finally {
         setIsLoading(false);
       }

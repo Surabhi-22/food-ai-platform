@@ -20,6 +20,61 @@ interface ChatMessageProps {
   message: Message;
 }
 
+/* ── Lightweight Markdown → HTML ──────────────────────────────────────── */
+
+function renderMarkdown(text: string): string {
+  // Escape HTML first
+  let html = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // Tables: detect lines starting with |
+  html = html.replace(
+    /((?:^\|.+\|$\n?)+)/gm,
+    (tableBlock) => {
+      const rows = tableBlock.trim().split("\n").filter(Boolean);
+      let table = '<table style="border-collapse:collapse;width:100%;margin:8px 0;font-size:13px;">';
+      rows.forEach((row, i) => {
+        // Skip separator rows like |---|---|
+        if (/^\|[\s-:|]+\|$/.test(row)) return;
+        const cells = row.split("|").filter((_, idx, arr) => idx > 0 && idx < arr.length - 1);
+        const tag = i === 0 ? "th" : "td";
+        const bgStyle = i === 0 ? 'background:#f1f5f9;font-weight:600;' : (i % 2 === 0 ? 'background:#f8fafc;' : '');
+        table += "<tr>";
+        cells.forEach((cell) => {
+          table += `<${tag} style="border:1px solid #e2e8f0;padding:6px 10px;text-align:left;${bgStyle}">${cell.trim()}</${tag}>`;
+        });
+        table += "</tr>";
+      });
+      table += "</table>";
+      return table;
+    }
+  );
+
+  // Bold: **text**
+  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+
+  // Bullet points: lines starting with • or -
+  html = html.replace(/^[•\-]\s+(.+)$/gm, '<div style="display:flex;gap:6px;margin:2px 0;"><span>•</span><span>$1</span></div>');
+
+  // Numbered lists: lines starting with 1. 2. etc
+  html = html.replace(/^(\d+)\.\s+(.+)$/gm, '<div style="display:flex;gap:6px;margin:2px 0;"><span style="font-weight:600;">$1.</span><span>$2</span></div>');
+
+  // Headings (inline): lines starting with ## or ###  
+  html = html.replace(/^###\s+(.+)$/gm, '<div style="font-size:14px;font-weight:700;margin:10px 0 4px;">$1</div>');
+  html = html.replace(/^##\s+(.+)$/gm, '<div style="font-size:15px;font-weight:700;margin:12px 0 4px;">$1</div>');
+
+  // Line breaks
+  html = html.replace(/\n/g, "<br/>");
+
+  // Clean up excessive <br/> after block elements
+  html = html.replace(/(<\/table>)<br\/>/g, "$1");
+  html = html.replace(/(<\/div>)<br\/>/g, "$1");
+
+  return html;
+}
+
 export default function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === "user";
   const isStreaming = message.isStreaming && message.content === "";
@@ -55,12 +110,11 @@ export default function ChatMessage({ message }: ChatMessageProps) {
             {/* Message text with markdown-like rendering */}
             <div
               className={cn(
-                "text-[15px] leading-relaxed whitespace-pre-wrap break-words",
+                "text-[15px] leading-relaxed break-words prose-sm",
                 isUser ? "text-primary-foreground font-medium" : "text-foreground/90 font-medium"
               )}
-            >
-              {message.content}
-            </div>
+              dangerouslySetInnerHTML={{ __html: renderMarkdown(message.content) }}
+            />
 
             {/* Sources (assistant only) */}
             {!isUser && message.sources && message.sources.length > 0 && (

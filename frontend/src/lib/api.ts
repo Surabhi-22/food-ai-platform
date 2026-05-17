@@ -91,9 +91,11 @@ api.interceptors.response.use(
       toast.error("Server error. Our team has been notified. Please try again later.");
     }
 
-    // Network Error (no response at all)
+    // Network Error (no response at all) — silently reject.
+    // On Vercel without a backend, every API call would trigger this;
+    // individual pages/services handle fallbacks gracefully.
     if (!error.response && error.message === "Network Error") {
-      toast.error("Network error. Please check your internet connection.");
+      console.debug("[api] Network error suppressed — backend unreachable");
     }
 
     return Promise.reject(error);

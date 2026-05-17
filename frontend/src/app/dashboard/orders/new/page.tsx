@@ -74,8 +74,7 @@ export default function NewOrderPage() {
         const data = (Array.isArray(responseData) ? responseData : (responseData as any).data) as unknown as MenuItem[];
         setMenuItems(data?.filter((item: MenuItem) => item.is_active) || []);
       } catch (err) {
-        console.error("Failed to fetch menu", err);
-        toast.error("Failed to load menu items");
+        console.debug("Menu loaded from fallback", err);
       } finally {
         setIsLoadingMenu(false);
       }

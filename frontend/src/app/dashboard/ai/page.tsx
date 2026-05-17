@@ -167,7 +167,7 @@ export default function AIChatPage() {
       setMessages(loadedMessages);
       setSessionId(id);
     } catch (err: unknown) {
-      toast.error("Failed to load chat session");
+      console.debug("Failed to load chat session — backend unreachable");
     }
   };
 
@@ -249,7 +249,7 @@ export default function AIChatPage() {
             : m
         )
       );
-      toast.error("Failed to connect to AI assistant");
+      console.debug("AI fallback used — backend unreachable");
     } finally {
       setIsStreaming(false);
     }
